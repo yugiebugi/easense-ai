@@ -1,0 +1,3203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="artifact-type" content="tool">
+<meta name="design-style" content="kiln">
+<title>EASense-AI — East Asian Language &amp; Culture Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600&family=Shippori+Mincho:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  color-scheme: light;
+
+  /* 1. Kiln Style Tokens */
+  --background: #f4f1ea;
+  --surface-container-low: #ebe6db;
+  --surface-container: #e3ddd0;
+  --surface-container-high: #d9d1c2;
+
+  --on-surface: #1c1b18;
+  --on-surface-variant: #5e5a51;
+
+  --outline: #1c1b18;
+  --outline-variant: #d2cbbd;
+
+  --primary: #1c1b18;
+  --on-primary: #f4f1ea;
+  --primary-container: #ebe6db;
+  --on-primary-container: #1c1b18;
+  --secondary: #4a5d46;
+  --tertiary: #9e3b2b;
+  --error: #9e2a22;
+  --on-error: #f4f1ea;
+
+  --data-1: #4a5d46;
+  --data-2: #9e3b2b;
+  --data-3: #1c1b18;
+  --data-4: #8a6f48;
+  --data-context: #c7bfb0;
+
+  --font-headline: 'Shippori Mincho', 'Noto Sans SC', 'Noto Sans KR', serif;
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans SC', 'Noto Sans KR', sans-serif;
+  --font-label: 'Geist Mono', 'Noto Sans SC', 'Noto Sans KR', monospace;
+
+  --rounded: 0.125rem;
+  --rounded-lg: 0.125rem;
+  --rounded-full: 0.125rem;
+
+  --rule-sumi-left: 2px solid var(--outline);
+  --rule-sumi: 1px solid var(--outline);
+  --rule-linen: 1px solid var(--outline-variant);
+  --rule-moss-left: 3px solid var(--secondary);
+  --rule-cinnabar-left: 3px solid var(--tertiary);
+  --label-tracking: 0.14em;
+
+  /* 3. Shared Foundation Tokens */
+  --positive: #3b5e3c;
+  --warning: #8a611c;
+  --surface-paper-bright: #faf8f3;
+  --surface-cinnabar-tint: #f3e6e3;
+  --surface-moss-tint: #e4ebe2;
+  --surface-ochre-tint: #f2eadc;
+
+  --focus: var(--primary);
+
+  /* Focused Tool Type Scale */
+  --display-size: clamp(1.85rem, 1.45rem + 1.3vw, 2.5rem);
+  --headline-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.55rem);
+  --subhead-size: clamp(1.0625rem, 1rem + 0.25vw, 1.2rem);
+  --body-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  --label-size: 0.75rem;
+
+  /* Spacing Scale (4pt base) */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+}
+
+/* Base reset */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  overflow-x: clip;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+header { position: static !important; }
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xl);
+  padding: var(--space-xl) var(--space-lg) var(--space-2xl);
+  max-width: 1180px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.page-grid * { min-width: 0; }
+
+/* Typography */
+.display {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: var(--display-size);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.subhead-moss {
+  font-family: var(--font-headline);
+  font-weight: 500;
+  font-size: var(--subhead-size);
+  line-height: 1.4;
+  color: var(--secondary);
+  margin: var(--space-xs) 0 0;
+}
+
+.section-title {
+  font-family: var(--font-headline);
+  font-weight: 600;
+  font-size: var(--headline-size);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--on-surface);
+  margin: 0;
+}
+
+.label {
+  font-family: var(--font-label);
+  font-weight: 500;
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  letter-spacing: var(--label-tracking);
+  color: var(--secondary);
+}
+
+.script-text {
+  letter-spacing: 0;
+  text-transform: none;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  font-family: var(--font-headline);
+}
+
+.prose-narrow {
+  max-width: 65ch;
+  color: var(--on-surface-variant);
+  margin: var(--space-xs) 0 0;
+}
+
+/* Header & Hanko Seal */
+.hero-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-lg);
+  align-items: start;
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--rule-sumi);
+}
+
+.header-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.seal-stamp {
+  border: 1px solid var(--tertiary);
+  color: var(--tertiary);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  padding: var(--space-sm) var(--space-xs);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  user-select: none;
+  background: var(--surface-paper-bright);
+  border-radius: var(--rounded);
+  line-height: 1.2;
+}
+
+/* Status & Filter Bar */
+.workspace-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-container-low);
+  border-left: var(--rule-sumi-left);
+  border-radius: var(--rounded);
+}
+
+.lang-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.workspace-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+}
+
+.stat-chip strong {
+  color: var(--on-surface);
+  font-family: var(--font-headline);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Quick Jump Strip */
+.module-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  border-bottom: var(--rule-linen);
+  padding-bottom: var(--space-md);
+}
+
+.nav-jump {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-md);
+  border: var(--rule-linen);
+  background: var(--surface-paper-bright);
+  color: var(--on-surface);
+  border-radius: var(--rounded);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+
+.nav-jump:hover {
+  background: var(--surface-container);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--rounded);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out), opacity var(--dur-micro) var(--ease-out);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+.btn-primary:hover {
+  background: var(--on-surface-variant);
+  border-color: var(--on-surface-variant);
+}
+
+.btn-secondary {
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+  border: var(--rule-sumi);
+}
+.btn-secondary:hover {
+  background: var(--surface-container-high);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--on-surface-variant);
+  border: var(--rule-linen);
+}
+.btn-ghost:hover {
+  background: var(--surface-container-low);
+  color: var(--on-surface);
+}
+
+.btn-pill-filter {
+  background: var(--surface-paper-bright);
+  color: var(--on-surface);
+  border: var(--rule-linen);
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--rounded);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color var(--dur-micro) var(--ease-out), color var(--dur-micro) var(--ease-out);
+}
+.btn-pill-filter:hover {
+  background: var(--surface-container);
+}
+.btn-pill-filter[aria-pressed="true"],
+.btn-pill-filter.is-active {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Section Layout */
+.tool-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: var(--rule-linen);
+}
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-md);
+}
+
+/* Washi Card & Panels */
+.washi-card {
+  background: var(--surface-container-low);
+  border-left: var(--rule-sumi-left);
+  border-radius: var(--rounded);
+  padding: var(--space-lg);
+}
+
+.washi-panel {
+  background: var(--surface-paper-bright);
+  border: var(--rule-linen);
+  border-radius: var(--rounded);
+  padding: var(--space-lg);
+}
+
+.card-wrapper {
+  container-type: inline-size;
+}
+
+/* Split Tool Layouts */
+.split-tool {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.35fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-md);
+}
+
+/* Form Controls */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field-label {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--on-surface-variant);
+}
+
+.control-input,
+.control-select,
+.control-textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-paper-bright);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--rounded);
+  color: var(--on-surface);
+  transition: box-shadow var(--dur-micro) var(--ease-out), background-color var(--dur-micro) var(--ease-out);
+}
+
+.control-select {
+  padding-right: var(--space-xl);
+}
+
+.control-input:focus,
+.control-select:focus,
+.control-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: flex-end;
+}
+.input-row .field-group {
+  flex: 1 1 220px;
+}
+
+/* Phrase Selector Chips */
+.phrase-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: var(--space-xs);
+}
+
+.phrase-item {
+  width: 100%;
+  text-align: left;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-paper-bright);
+  border: var(--rule-linen);
+  border-left: 2px solid transparent;
+  border-radius: var(--rounded);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: background-color var(--dur-micro) var(--ease-out), border-color var(--dur-micro) var(--ease-out);
+}
+
+.phrase-item:hover {
+  background: var(--surface-container);
+}
+
+.phrase-item.is-selected {
+  background: var(--surface-container-low);
+  border-left: var(--rule-cinnabar-left);
+  border-color: var(--outline);
+}
+
+.phrase-native {
+  font-family: var(--font-headline);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.phrase-sub {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+}
+
+/* Tags & Badges */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.1875rem 0.5rem;
+  border-radius: var(--rounded);
+  border: var(--rule-linen);
+  background: var(--surface-container-low);
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.tag-cinnabar {
+  background: var(--surface-cinnabar-tint);
+  border-color: var(--tertiary);
+  color: var(--tertiary);
+}
+
+.tag-moss {
+  background: var(--surface-moss-tint);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+.tag-ochre {
+  background: var(--surface-ochre-tint);
+  border-color: var(--data-4);
+  color: var(--data-4);
+}
+
+/* Translation Verdict Panels */
+.verdict-box {
+  padding: var(--space-md);
+  border-radius: var(--rounded);
+  border: var(--rule-linen);
+}
+
+.verdict-literal {
+  background: var(--surface-cinnabar-tint);
+  border-left: var(--rule-cinnabar-left);
+}
+
+.verdict-cultural {
+  background: var(--surface-moss-tint);
+  border-left: var(--rule-moss-left);
+}
+
+.native-hero {
+  font-family: var(--font-headline);
+  font-size: clamp(1.6rem, 1.3rem + 1vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--on-surface);
+  margin: var(--space-xs) 0;
+}
+
+.romanized-line {
+  font-family: var(--font-label);
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+/* Register Morpheme Tokens */
+.morpheme-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0;
+}
+
+.morpheme-chip {
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-md);
+  border: var(--rule-linen);
+  border-radius: var(--rounded);
+  background: var(--surface-paper-bright);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.morpheme-chip:hover {
+  background: var(--surface-container);
+}
+
+.morpheme-chip.is-active {
+  background: var(--surface-container-high);
+  box-shadow: inset 0 -2px 0 var(--tertiary);
+}
+
+.morpheme-token {
+  font-family: var(--font-headline);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.morpheme-role {
+  font-family: var(--font-label);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+}
+
+/* Alert / Warning Box */
+.pragmatic-callout {
+  padding: var(--space-md);
+  border-radius: var(--rounded);
+  background: var(--surface-container);
+  border-left: var(--rule-sumi-left);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.pragmatic-callout.is-danger {
+  background: var(--surface-cinnabar-tint);
+  border-left: var(--rule-cinnabar-left);
+}
+
+.pragmatic-callout.is-safe {
+  background: var(--surface-moss-tint);
+  border-left: var(--rule-moss-left);
+}
+
+/* Roleplay Simulator */
+.roleplay-dialogue {
+  background: var(--surface-paper-bright);
+  border: var(--rule-linen);
+  border-radius: var(--rounded);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.npc-bubble {
+  background: var(--surface-container-low);
+  border-left: var(--rule-sumi-left);
+  padding: var(--space-md);
+  border-radius: var(--rounded);
+}
+
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.choice-btn {
+  width: 100%;
+  text-align: left;
+  min-height: 48px;
+  padding: var(--space-md);
+  background: var(--surface-paper-bright);
+  border: var(--rule-linen);
+  border-radius: var(--rounded);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  transition: background-color var(--dur-micro) var(--ease-out), box-shadow var(--dur-micro) var(--ease-out);
+}
+
+.choice-btn:hover {
+  background: var(--surface-container-low);
+}
+
+.choice-btn.is-chosen-good {
+  background: var(--surface-moss-tint);
+  border-color: var(--secondary);
+  box-shadow: inset 3px 0 0 var(--secondary);
+}
+
+.choice-btn.is-chosen-bad {
+  background: var(--surface-cinnabar-tint);
+  border-color: var(--tertiary);
+  box-shadow: inset 3px 0 0 var(--tertiary);
+}
+
+/* Face-Threat Meter */
+.severity-track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.severity-pip {
+  height: 10px;
+  background: var(--surface-container-high);
+  border-radius: var(--rounded);
+}
+
+.severity-pip.is-filled-low { background: var(--secondary); }
+.severity-pip.is-filled-mid { background: var(--data-4); }
+.severity-pip.is-filled-high { background: var(--tertiary); }
+
+/* Chart Container */
+.chart-box {
+  position: relative;
+  min-height: 350px;
+  width: 100%;
+}
+
+/* Tables */
+.kiln-table-wrap {
+  overflow-x: auto;
+}
+
+.kiln-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.kiln-table th {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  border-top: var(--rule-sumi);
+  border-bottom: var(--rule-sumi);
+  color: var(--secondary);
+}
+
+.kiln-table td {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: var(--rule-linen);
+  vertical-align: top;
+}
+
+/* Inline Status Message */
+.inline-feedback {
+  font-family: var(--font-label);
+  font-size: var(--label-size);
+  color: var(--secondary);
+  min-height: 1.2em;
+}
+
+/* Empty State */
+.empty-state {
+  padding: var(--space-xl);
+  text-align: left;
+  background: var(--surface-container-low);
+  border: var(--rule-linen);
+  border-radius: var(--rounded);
+}
+
+/* Responsive Breakpoints */
+@container (max-width: 520px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .split-tool {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-grid {
+    padding: var(--space-md);
+    gap: var(--space-lg);
+  }
+  .hero-header {
+    grid-template-columns: 1fr;
+  }
+  .seal-stamp {
+    writing-mode: horizontal-tb;
+    justify-self: start;
+    padding: var(--space-xs) var(--space-sm);
+  }
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="page-grid">
+  <!-- Header -->
+  <header class="hero-header">
+    <div>
+      <div class="header-meta">
+        <span class="label">Digital Humanities Pragmatics Studio</span>
+        <span class="tag tag-moss">Chinese · Japanese · Korean</span>
+        <span class="tag tag-ochre">Malaysian Cross-Cultural Lens</span>
+      </div>
+      <h1 class="display">EASense-AI: East Asian Language &amp; Culture Companion</h1>
+      <p class="subhead-moss">From literal glosses to socially fluent speech — decoding idioms, honorifics, and face-saving pragmatics.</p>
+      <p class="prose-narrow">
+        General translators render words while stripping away hierarchy, indirectness, and cultural subtext. EASense-AI pairs side-by-side pragmatic diagnostics with interactive register shifts, roleplay simulations, and Malaysian politeness comparisons.
+      </p>
+    </div>
+    <div class="seal-stamp" aria-label="Catalog stamp EASense AI">EASENSE · 26</div>
+  </header>
+
+  <!-- Global Workspace Bar -->
+  <section class="workspace-bar" aria-label="Global workspace controls">
+    <div class="lang-filter-group">
+      <span class="field-label">Active Language Focus:</span>
+      <button type="button" class="btn-pill-filter is-active" data-global-lang="all" onclick="setGlobalLanguage('all')">All (ZH / JA / KO)</button>
+      <button type="button" class="btn-pill-filter" data-global-lang="zh" onclick="setGlobalLanguage('zh')">Chinese 中文</button>
+      <button type="button" class="btn-pill-filter" data-global-lang="ja" onclick="setGlobalLanguage('ja')">Japanese 日本語</button>
+      <button type="button" class="btn-pill-filter" data-global-lang="ko" onclick="setGlobalLanguage('ko')">Korean 한국어</button>
+    </div>
+    <div class="workspace-stats">
+      <div class="stat-chip">Saved Phrases: <strong id="stat-saved-count">0</strong></div>
+      <div class="stat-chip">Roleplays Cleared: <strong id="stat-roleplay-count">0/4</strong></div>
+      <button type="button" class="btn btn-secondary" onclick="exportStudyNotes()">
+        <i data-lucide="download" aria-hidden="true" width="16" height="16"></i> Export Notes
+      </button>
+      <button type="button" class="btn btn-ghost" id="btn-reset-all" onclick="handleResetAll(this)">Reset Progress</button>
+    </div>
+  </section>
+
+  <!-- Quick Module Jump Navigation -->
+  <nav class="module-nav" aria-label="Companion modules">
+    <button type="button" class="nav-jump" onclick="jumpToSection('sec-translator')">01 · Contextual Translator</button>
+    <button type="button" class="nav-jump" onclick="jumpToSection('sec-register')">02 · Register &amp; Honorifics</button>
+    <button type="button" class="nav-jump" onclick="jumpToSection('sec-roleplay')">03 · Roleplay Simulator</button>
+    <button type="button" class="nav-jump" onclick="jumpToSection('sec-malaysia')">04 · Malaysian Politeness Lab</button>
+    <button type="button" class="nav-jump" onclick="jumpToSection('sec-notebook')">05 · Study Notebook</button>
+  </nav>
+
+  <!-- MODULE 1: CONTEXTUAL TRANSLATION & PRAGMATIC GAP ANALYZER -->
+  <section class="tool-section" id="sec-translator">
+    <div class="section-header">
+      <div>
+        <span class="label">01 · Beyond Literal Machine Translation</span>
+        <h2 class="section-title">Contextual Translator &amp; Pragmatic Gap Analyzer</h2>
+        <p class="prose-narrow">Compare what literal machine translation outputs against culturally grounded usage, and inspect why direct glosses cause pragmatic failure.</p>
+      </div>
+      <span class="inline-feedback" id="translator-feedback" aria-live="polite"></span>
+    </div>
+
+    <div class="split-tool">
+      <!-- Left: Input & Curated Corpus Selector -->
+      <div class="washi-card">
+        <div class="field-group" style="margin-bottom: var(--space-md);">
+          <label class="field-label" for="custom-intent-input">Search Expression or Describe Your Intent (e.g., “refuse lecturer”, “thank senior”, “eat well”)</label>
+          <div class="input-row">
+            <div class="field-group">
+              <input type="text" id="custom-intent-input" class="control-input" placeholder="Type keyword or phrase…" oninput="filterCorpusList(this.value)">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="analyzeCustomIntent()">Analyze</button>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-bottom: var(--space-sm);">
+          <label class="field-label" for="corpus-category-select">Filter by Pragmatic Category</label>
+          <select id="corpus-category-select" class="control-select" onchange="filterCorpusByCategory(this.value)">
+            <option value="all">All Categories</option>
+            <option value="refusal">Indirect Refusal &amp; Face-Saving</option>
+            <option value="social">Social Etiquette &amp; Gratitude</option>
+            <option value="hierarchy">Academic &amp; Workplace Hierarchy</option>
+            <option value="cultural">Idioms, Drama &amp; Classical Terms</option>
+          </select>
+        </div>
+
+        <div class="field-label" style="margin-bottom: var(--space-xs);">Select Expression to Inspect (<span id="corpus-count-label">16</span> items)</div>
+        <div class="phrase-list" id="corpus-phrase-list" role="listbox" aria-label="East Asian expressions"></div>
+      </div>
+
+      <!-- Right: Side-by-Side Pragmatic Verdict -->
+      <div class="washi-panel card-wrapper" id="translator-output-panel">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: var(--space-sm);">
+          <div>
+            <span class="tag tag-moss" id="out-lang-tag">Chinese · 中文</span>
+            <span class="tag tag-ochre" id="out-cat-tag">Indirect Refusal</span>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-save-phrase" onclick="saveCurrentPhrase()">
+            <i data-lucide="bookmark" aria-hidden="true" width="16" height="16"></i> Save to Notebook
+          </button>
+        </div>
+
+        <div class="native-hero script-text" id="out-native">改天再约吧</div>
+        <div class="romanized-line" id="out-romanized">gǎitiān zài yuē ba</div>
+
+        <div class="comparison-grid" style="margin-top: var(--space-md);">
+          <div class="verdict-box verdict-literal">
+            <span class="label" style="color: var(--tertiary);">Literal Machine Translation</span>
+            <p style="font-weight: 600; margin: var(--space-xs) 0;" id="out-literal">“Let’s make an appointment another day.”</p>
+            <p style="font-size: 0.85rem; color: var(--on-surface-variant); margin: 0;" id="out-failure-type">Pragmatic Risk: Ignorance of Context — taken literally, a learner waits for a reschedule that was never meant to happen.</p>
+          </div>
+
+          <div class="verdict-box verdict-cultural">
+            <span class="label" style="color: var(--secondary);">EASense-AI Cultural Output</span>
+            <p style="font-weight: 600; margin: var(--space-xs) 0;" id="out-cultural">“Let’s raincheck / I’ll pass for now (softened polite decline).”</p>
+            <p style="font-size: 0.85rem; color: var(--on-surface-variant); margin: 0;" id="out-function">Communicative Intent: Preserves mutual face (mianzi) using temporal postponement instead of an abrupt “no”.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: var(--space-md); display: grid; gap: var(--space-sm);">
+          <div class="pragmatic-callout">
+            <span class="label">Cultural Subtext &amp; Appropriate Usage</span>
+            <p style="margin: 0; font-size: 0.92rem;" id="out-explanation"></p>
+          </div>
+          <div class="pragmatic-callout is-danger">
+            <span class="label" style="color: var(--tertiary);">When NOT to Use / Common Learner Trap</span>
+            <p style="margin: 0; font-size: 0.92rem;" id="out-trap"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 2: SPEECH REGISTER & HONORIFIC BREAKDOWN -->
+  <section class="tool-section" id="sec-register">
+    <div class="section-header">
+      <div>
+        <span class="label">02 · Sociopragmatic Modulator</span>
+        <h2 class="section-title">Speech Register &amp; Honorific Breakdown</h2>
+        <p class="prose-narrow">Adjust who you are speaking to and inspect how pronouns, honorific markers, and verb endings shift across Chinese, Japanese, and Korean.</p>
+      </div>
+    </div>
+
+    <div class="washi-card">
+      <div class="input-row">
+        <div class="field-group">
+          <label class="field-label" for="reg-lang-select">Target Language</label>
+          <select id="reg-lang-select" class="control-select" onchange="updateRegisterSimulator()">
+            <option value="ja">Japanese (日本語 — Keigo / Teineigo / Plain)</option>
+            <option value="ko">Korean (한국어 — Hasipsio / Haeyo / Banmal)</option>
+            <option value="zh">Chinese (中文 — Deferential / Polite / Casual)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="reg-intent-select">Communicative Act</label>
+          <select id="reg-intent-select" class="control-select" onchange="updateRegisterSimulator()">
+            <option value="greet">Greeting &amp; Checking In</option>
+            <option value="request">Requesting Academic Help</option>
+            <option value="refuse">Polite Indirect Refusal</option>
+            <option value="thank">Expressing Gratitude for Effort</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="reg-interlocutor-select">Who Are You Addressing?</label>
+          <select id="reg-interlocutor-select" class="control-select" onchange="updateRegisterSimulator()">
+            <option value="high">Lecturer / Professor / Manager (Higher Status, Distant)</option>
+            <option value="mid">Senior Student / Acquaintance (Polite Standard)</option>
+            <option value="low">Close Friend / Younger Peer (Equal or Lower, Close)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="washi-panel" style="margin-top: var(--space-md);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+          <span class="tag tag-moss" id="reg-tier-badge">Teineigo · Polite Standard</span>
+          <span class="label" id="reg-social-coords">Status: Non-Equal · Distance: Formal</span>
+        </div>
+
+        <div class="native-hero script-text" id="reg-output-native"></div>
+        <div class="romanized-line" id="reg-output-roman"></div>
+        <p style="margin: var(--space-xs) 0 0; font-weight: 500;" id="reg-output-gloss"></p>
+
+        <div style="margin-top: var(--space-md);">
+          <span class="label">Interactive Morpheme &amp; Honorific Inspector (Click any token)</span>
+          <div class="morpheme-strip" id="reg-morpheme-strip"></div>
+          <div class="pragmatic-callout" id="reg-morpheme-detail">
+            <span class="label">Token Note</span>
+            <p style="margin: 0; font-size: 0.9rem;" id="reg-morpheme-text">Select a highlighted morpheme above to inspect its grammatical and social function.</p>
+          </div>
+        </div>
+
+        <div class="pragmatic-callout is-danger" style="margin-top: var(--space-md);" id="reg-warning-box">
+          <span class="label" style="color: var(--tertiary);">Register Mismatch Alert</span>
+          <p style="margin: 0; font-size: 0.9rem;" id="reg-warning-text"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 3: SIMULATED REAL-WORLD ROLEPLAY SCENARIOS -->
+  <section class="tool-section" id="sec-roleplay">
+    <div class="section-header">
+      <div>
+        <span class="label">03 · Interactive Pragmatic Rehearsal</span>
+        <h2 class="section-title">Simulated Real-World Roleplay Scenarios</h2>
+        <p class="prose-narrow">Test your register and face-saving instincts in realistic campus, workplace, and dining encounters before facing them in person.</p>
+      </div>
+    </div>
+
+    <div class="split-tool">
+      <!-- Scenario & Language Chooser -->
+      <div class="washi-card">
+        <div class="field-group" style="margin-bottom: var(--space-md);">
+          <label class="field-label" for="rp-lang-select">Roleplay Language</label>
+          <select id="rp-lang-select" class="control-select" onchange="loadRoleplayScenario()">
+            <option value="zh">Chinese (中文)</option>
+            <option value="ja">Japanese (日本語)</option>
+            <option value="ko">Korean (한국어)</option>
+          </select>
+        </div>
+
+        <div class="field-label" style="margin-bottom: var(--space-xs);">Select Scenario</div>
+        <div class="phrase-list" id="rp-scenario-list"></div>
+      </div>
+
+      <!-- Active Dialogue Stage -->
+      <div class="roleplay-dialogue" id="rp-stage">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+          <div>
+            <span class="tag tag-ochre" id="rp-context-tag">Academic · High Status</span>
+            <h3 class="section-title" style="margin-top: var(--space-xs);" id="rp-title">Greeting &amp; Consulting a Lecturer</h3>
+          </div>
+          <span class="tag tag-moss" id="rp-completion-badge">Not Attempted</span>
+        </div>
+
+        <p style="margin: 0; font-size: 0.92rem; color: var(--on-surface-variant);" id="rp-setting-desc"></p>
+
+        <div class="npc-bubble">
+          <span class="label" id="rp-npc-name">Interlocutor Prompt</span>
+          <div class="script-text" style="font-size: 1.25rem; font-weight: 600; margin-top: var(--space-xs);" id="rp-npc-line"></div>
+          <div class="romanized-line" id="rp-npc-roman"></div>
+          <p style="margin: var(--space-xs) 0 0; font-size: 0.9rem; color: var(--on-surface-variant);" id="rp-npc-en"></p>
+        </div>
+
+        <div>
+          <span class="label">Choose Your Response</span>
+          <div class="choice-list" id="rp-choices" style="margin-top: var(--space-xs);"></div>
+        </div>
+
+        <div class="pragmatic-callout" id="rp-feedback-panel" style="display: none;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+            <span class="label" id="rp-feedback-verdict">Pragmatic Assessment</span>
+            <span class="label" id="rp-severity-label">Face-Threat Risk: 1 / 5</span>
+          </div>
+          <div class="severity-track" id="rp-severity-track" aria-hidden="true"></div>
+          <p style="margin: var(--space-xs) 0 0; font-weight: 600;" id="rp-npc-reaction"></p>
+          <p style="margin: 0; font-size: 0.9rem;" id="rp-feedback-explain"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 4: INTERCULTURAL COMPARISONS WITH MALAYSIAN POLITENESS NORMS -->
+  <section class="tool-section" id="sec-malaysia">
+    <div class="section-header">
+      <div>
+        <span class="label">04 · Cross-Cultural Pragmatics Evidence</span>
+        <h2 class="section-title">Intercultural Lab: Malaysian vs. East Asian Politeness Norms</h2>
+        <p class="prose-narrow">Grounded in Yan &amp; Bidin (2025), explore how Malaysian undergraduates navigate face-threat and refusal strategies compared to Chinese counterparts—and how to bridge Malaysian <em>budi bahasa</em> with Chinese, Japanese, and Korean norms.</p>
+      </div>
+    </div>
+
+    <div class="split-tool">
+      <!-- Empirical Chart Panel -->
+      <div class="washi-panel">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md);">
+          <div>
+            <span class="label" id="chart-kicker">5-Point Likert Scale · 8 Scenarios</span>
+            <h3 class="section-title" style="font-size: 1.15rem;" id="chart-title">Perceived Face-Threat &amp; Offense Severity</h3>
+          </div>
+          <div style="display: flex; gap: var(--space-xs);">
+            <button type="button" class="btn-pill-filter is-active" id="btn-chart-severity" onclick="switchChartMode('severity')">Face-Threat Ratings</button>
+            <button type="button" class="btn-pill-filter" id="btn-chart-strategy" onclick="switchChartMode('strategy')">Refusal Strategies (%)</button>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <canvas id="interculturalChart" aria-label="Malaysian and Chinese cross-cultural pragmatics chart"></canvas>
+        </div>
+
+        <p style="margin: var(--space-sm) 0 0; font-size: 0.82rem; color: var(--on-surface-variant);" id="chart-caption">
+          Source: Yan &amp; Bidin (2025), Forum for Linguistic Studies. Malaysian undergraduates (BALBAS) rated face-threat higher across all 8 contexts, peaking in hierarchical refusals to Executives (4.00 vs. 2.90) and Managers (3.67 vs. 2.80).
+        </p>
+      </div>
+
+      <!-- Interactive Malaysian -> East Asian Pragmatic Bridge -->
+      <div class="washi-card">
+        <div class="field-group" style="margin-bottom: var(--space-md);">
+          <label class="field-label" for="my-scenario-select">Compare Cultural Strategy for Context</label>
+          <select id="my-scenario-select" class="control-select" onchange="updateMalaysiaBridge()">
+            <option value="lecturer">Refusing or Requesting from a Lecturer (Non-Equal, Distant)</option>
+            <option value="executive">Declining an Executive or Manager (High Hierarchy)</option>
+            <option value="peer">Declining a Close Friend or Classmate (Equal, Peer)</option>
+            <option value="dining">Addressing Elders, Seniors &amp; Service Staff</option>
+          </select>
+        </div>
+
+        <div style="display: grid; gap: var(--space-sm);">
+          <div class="washi-panel" style="padding: var(--space-md);">
+            <span class="tag tag-ochre">Malaysian Norm (Budi Bahasa &amp; Face)</span>
+            <p style="margin: var(--space-xs) 0 0; font-size: 0.92rem;" id="bridge-my-text"></p>
+          </div>
+
+          <div class="washi-panel" style="padding: var(--space-md);">
+            <span class="tag tag-moss">Chinese · Japanese · Korean Parallel</span>
+            <p style="margin: var(--space-xs) 0 0; font-size: 0.92rem;" id="bridge-ea-text"></p>
+          </div>
+
+          <div class="pragmatic-callout is-safe">
+            <span class="label" style="color: var(--positive);">Transfer Advantage &amp; Caution for Malaysian Learners</span>
+            <p style="margin: 0; font-size: 0.9rem;" id="bridge-tip-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantitative Research Benchmark Table (Dong et al. 2025 & Yan & Bidin 2025) -->
+    <div class="washi-panel">
+      <span class="label">Empirical Rationale · Why Pragmatic Companions Matter</span>
+      <h3 class="section-title" style="font-size: 1.15rem; margin-top: var(--space-xs); margin-bottom: var(--space-md);">Measured Gaps in General AI Translation &amp; Cross-Cultural Refusals</h3>
+      <div class="kiln-table-wrap">
+        <table class="kiln-table">
+          <thead>
+            <tr>
+              <th>Diagnostic Dimension</th>
+              <th>Observed Benchmark</th>
+              <th>Pragmatic Implication for Students</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Distributional vs. Lexical Overlap (Dong et al., 2025)</td>
+              <td>Cosine 0.906 vs. Jaccard 0.325</td>
+              <td>AI captures broad topic structure but substitutes flattened modern words (e.g., “gentleman”) for culturally dense concepts (<em>junzi</em>, “man of complete virtue”).</td>
+            </tr>
+            <tr>
+              <td>Thematic Cohesion &amp; Affective Intensity (Dong et al., 2025)</td>
+              <td>AI: 7 fragmented topics vs. Human: 2 core topics</td>
+              <td>General LLMs smooth probability toward conservative phrasing, causing affective intensity decay and blurred moral/social distinctions.</td>
+            </tr>
+            <tr>
+              <td>Refusal Formula Structure (Yan &amp; Bidin, 2025)</td>
+              <td>Chinese: 4.2 strategies vs. Malaysian: 3.8 strategies</td>
+              <td>Chinese learners rely heavily on Postponement + Alternative + Gratitude (16.10%); Malaysian learners pair Regret/Apology (19.38%) with controlled peer directness.</td>
+            </tr>
+            <tr>
+              <td>Hierarchical Face-Threat Sensitivity (Yan &amp; Bidin, 2025)</td>
+              <td>Malaysian Executive 4.00 / Manager 3.67 vs. Chinese 2.90 / 2.80</td>
+              <td>Malaysian learners possess strong power-distance instincts—EASense-AI channels that awareness into exact Japanese <em>keigo</em>, Korean <em>-습니다</em>, and Chinese honorifics.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE 5: PERSONAL STUDY NOTEBOOK (PERSISTED) -->
+  <section class="tool-section" id="sec-notebook">
+    <div class="section-header">
+      <div>
+        <span class="label">05 · Personal Study Archive</span>
+        <h2 class="section-title">Saved Cultural Phrasebook &amp; Reflection Notes</h2>
+        <p class="prose-narrow">Phrases bookmarked from the Contextual Translator are saved automatically for revision and export.</p>
+      </div>
+    </div>
+
+    <div id="notebook-container"></div>
+  </section>
+
+  <!-- Methodology & Source Attribution Footer -->
+  <footer class="washi-card" style="margin-top: var(--space-md);">
+    <span class="label">Project Grounding &amp; Academic Attribution</span>
+    <p style="margin: var(--space-xs) 0 0; font-size: 0.875rem; color: var(--on-surface-variant); max-width: 80ch;">
+      Prototype developed for East Asian Studies pragmatic learning (AIX1007 Digital Humanities framework, Universiti Malaya). Linguistic diagnostics and empirical benchmarks draw upon Yifei Li (2023) on pragmatic failures in Chinese–English translation; Menghan Dong, Youzhi Wu, Siqi Wang, and Zhen Wu (PACLIC 2025) on cultural gaps and affective intensity decay in LLM translation; Gang Yan and Siti Jamilah Bidin (Forum for Linguistic Studies, 2025) on refusal strategies and face concerns among Chinese and Malaysian undergraduates; and industry localization workflows reported by China Daily (2026).
+    </p>
+  </footer>
+</div>
+
+<api-shim></api-shim>
+<script>
+// =========================================================================
+// 1. CURATED PRAGMATIC CORPUS DATA (Chinese, Japanese, Korean)
+// =========================================================================
+const CORPUS_DATA = [
+  {
+    id: `zh-gaitian`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `refusal`,
+    categoryLabel: `Indirect Refusal`,
+    native: `改天再约吧`,
+    romanized: `gǎitiān zài yuē ba`,
+    literal: `“Let's make an appointment another day.”`,
+    failureRisk: `Ignorance of Context (Li, 2023): Literal tools make it sound like a confirmed future reschedule.`,
+    cultural: `“Let's take a raincheck / I'll pass for now (softened polite decline).”`,
+    intent: `Uses temporal postponement and vague future openness to decline without threatening the listener's face (mianzi).`,
+    explanation: `In Chinese high-context communication, direct refusal triggers social friction. As documented in Yan & Bidin (2025), postponement and hedging allow both parties to exit gracefully while preserving relational harmony.`,
+    trap: `Do not ask “Which exact day next week?” when someone replies with this unless they actively propose a date—it is usually a gentle closure.`
+  },
+  {
+    id: `zh-mafan`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `social`,
+    categoryLabel: `Social Etiquette`,
+    native: `麻烦你了`,
+    romanized: `máfan nǐ le`,
+    literal: `“I troubled you.”`,
+    failureRisk: `Pragmatic Transfer: Sounds overly apologetic or guilt-inducing when translated word-for-word into English.`,
+    cultural: `“Thank you for going out of your way / Sorry for the trouble (warm polite thanks).”`,
+    intent: `Acknowledges the listener's effort while softening a request or thanking someone who helped you.`,
+    explanation: `In East Asian politeness, recognizing the imposition placed on another person builds rapport. Pair with 您 (nín) as 麻烦您了 when speaking to a lecturer or elder.`,
+    trap: `Using 麻烦你了 without 您 to a senior professor can feel slightly casual; switch to 麻烦您了 or 有劳您了.`
+  },
+  {
+    id: `zh-xinku`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `hierarchy`,
+    categoryLabel: `Hierarchy & Work`,
+    native: `您辛苦了`,
+    romanized: `nín xīnkǔ le`,
+    literal: `“You suffered bitterness/hardship.”`,
+    failureRisk: `Lexical Flattening: Direct translation misses the warmth and ritualized acknowledgment of effort.`,
+    cultural: `“Thank you for all your hard work / You've worked tirelessly.”`,
+    intent: `Essential expression of appreciation after a lecture, meeting, or shared task.`,
+    explanation: `Chinese workplace and campus culture places high value on visibly recognizing others' labor. Using 您 elevates deference toward teachers, supervisors, and elders.`,
+    trap: `Avoid replying “不客气” casually to a superior; instead reciprocate politely with “应该的” (it's my duty) or “哪里哪里”.`
+  },
+  {
+    id: `zh-junzi`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `cultural`,
+    categoryLabel: `Classical & Idiom`,
+    native: `君子`,
+    romanized: `jūnzǐ`,
+    literal: `“Gentleman” (modern LLM baseline output).`,
+    failureRisk: `Semantic Drift & Intensity Decay (Dong et al., 2025): Modernizes an ethical ideal into a generic social etiquette label.`,
+    cultural: `“A person of complete moral virtue / exemplary character.”`,
+    intent: `Refers to Confucian ethical cultivation, moral leadership, and self-restraint—not merely polite manners or aristocratic birth.`,
+    explanation: `Dong et al. (2025) showed general AI systems compress rich Confucian terms like 君子 (jūnzǐ) and 道 (dào) into flattened words (“gentleman”, “way”), losing philosophical depth.`,
+    trap: `In classical studies essays, never leave 君子 as “gentleman” without explaining its moral dimension.`
+  },
+  {
+    id: `zh-bengong`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `cultural`,
+    categoryLabel: `Media & Historical`,
+    native: `本宫`,
+    romanized: `běngōng`,
+    literal: `“This palace.”`,
+    failureRisk: `Culture-Bound Term Failure (China Daily / Transn, 2026): Baffles audiences unfamiliar with imperial court pronouns.`,
+    cultural: `“I” (spoken with imperial rank, dignity, and court authority).`,
+    intent: `First-person self-reference used by an empress or high-ranking consort in historical dramas to assert status.`,
+    explanation: `Modern AI localization pipelines replace literal “this palace” with “I” while preserving royal authority through tone, titles, and register.`,
+    trap: `Never use 本宫 in real-life modern conversation except playfully among very close friends.`
+  },
+  {
+    id: `zh-youjiaowulei`,
+    lang: `zh`,
+    langLabel: `Chinese · 中文`,
+    category: `cultural`,
+    categoryLabel: `Classical & Idiom`,
+    native: `有教无类`,
+    romanized: `yǒu jiào wú lèi`,
+    literal: `“Education should have no class distinction.”`,
+    failureRisk: `Anachronistic Context Loss (Dong et al., 2025): Projects modern egalitarian policy onto Warring States history.`,
+    cultural: `“Through instruction, moral distinctions between people can be narrowed.”`,
+    intent: `Confucian ideal emphasizing education's transformative power across backgrounds within historical context.`,
+    explanation: `Understanding the historical backdrop prevents flattening classical aphorisms into generic modern slogans.`,
+    trap: `Always contextualize classical proverbs before citing them in cross-cultural essays.`
+  },
+  {
+    id: `ja-chotto`,
+    lang: `ja`,
+    langLabel: `Japanese · 日本語`,
+    category: `refusal`,
+    categoryLabel: `Indirect Refusal`,
+    native: `ちょっと考えておきます`,
+    romanized: `chotto kangaete okimasu`,
+    literal: `“I will think about it a little bit.”`,
+    failureRisk: `Critical Pragmatic Misreading: Foreign learners often assume “maybe yes” when the speaker actually means “no”.`,
+    cultural: `“I'm afraid that won't work / Let me politely decline.”`,
+    intent: `Softens refusal with ちょっと (a little) and future-oriented framing to avoid direct confrontation.`,
+    explanation: `In Japanese, ちょっと paired with hesitation or trailing off (〜はちょっと…) is one of the strongest signals of a polite refusal.`,
+    trap: `Following up repeatedly after hearing ちょっと考えておきます puts heavy pressure on the listener and breaks tatemae etiquette.`
+  },
+  {
+    id: `ja-yoroshiku`,
+    lang: `ja`,
+    langLabel: `Japanese · 日本語`,
+    category: `social`,
+    categoryLabel: `Social Etiquette`,
+    native: `よろしくお願いいたします`,
+    romanized: `yoroshiku onegai itashimasu`,
+    literal: `“Please treat me well / favorably.”`,
+    failureRisk: `Untranslatable Formula: Literal English sounds vague or overly submissive.`,
+    cultural: `“I look forward to working with you / Thank you in advance for your kind support.”`,
+    intent: `Establishes mutual goodwill and humility when starting a class, email, request, or collaboration.`,
+    explanation: `Notice the humble verb いたします (itashimasu) instead of します (shimasu) when addressing lecturers, supervisors, or clients.`,
+    trap: `Never use casual よろしく alone to a professor or elder; keep the full よろしくお願いいたします.`
+  },
+  {
+    id: `ja-sumimasen`,
+    lang: `ja`,
+    langLabel: `Japanese · 日本語`,
+    category: `social`,
+    categoryLabel: `Social Etiquette`,
+    native: `すみません`,
+    romanized: `sumimasen`,
+    literal: `“I am sorry / It does not end.”`,
+    failureRisk: `Over-Apology Confusion: Learners wonder why people say “sorry” when receiving a gift or calling a waiter.`,
+    cultural: `“Excuse me” / “Thank you very much (acknowledging your trouble).”`,
+    intent: `Bridges apology and gratitude by acknowledging the effort another person expended on your behalf.`,
+    explanation: `In Japanese restaurants, すみません politely gets staff attention; when someone holds a door or helps you, it expresses warm appreciation.`,
+    trap: `In formal academic emails to a professor, use 申し訳ございません (mōshiwake gozaimasen) for genuine apologies rather than すみません.`
+  },
+  {
+    id: `ja-osakini`,
+    lang: `ja`,
+    langLabel: `Japanese · 日本語`,
+    category: `hierarchy`,
+    categoryLabel: `Hierarchy & Work`,
+    native: `お先に失礼します`,
+    romanized: `osaki ni shitsurei shimasu`,
+    literal: `“I am committing rudeness ahead of you.”`,
+    failureRisk: `Cultural Omission: Leaving a lab, seminar, or office with just “Bye!” feels abrupt and inconsiderate.`,
+    cultural: `“Excuse me for leaving before you / Have a good evening.”`,
+    intent: `Demonstrates solidarity and humility toward colleagues or classmates still working.`,
+    explanation: `Pair it with お疲れ様でした (otsukaresama deshita, “thank you for your hard work today”) when exiting.`,
+    trap: `Never say ご苦労様 (gokurōsama) to someone of higher status—that is strictly downward from superior to subordinate.`
+  },
+  {
+    id: `ja-itadakimasu`,
+    lang: `ja`,
+    langLabel: `Japanese · 日本語`,
+    category: `cultural`,
+    categoryLabel: `Dining & Culture`,
+    native: `いただきます`,
+    romanized: `itadakimasu`,
+    literal: `“I humbly receive.”`,
+    failureRisk: `Secular Flattening: Often glossed as “Let's eat!”, erasing the humility and gratitude ethic.`,
+    cultural: `“I gratefully receive this meal (honoring the ingredients, cook, and host).”`,
+    intent: `Ritual expression of thankfulness before eating or receiving something from a superior.`,
+    explanation: `いただく is the humble (kenjōgo) verb for receiving/eating, symbolizing respect for life and labor.`,
+    trap: `Wait until elders or hosts signal to start before saying いただきます and picking up chopsticks.`
+  },
+  {
+    id: `ko-bap`,
+    lang: `ko`,
+    langLabel: `Korean · 한국어`,
+    category: `social`,
+    categoryLabel: `Social Etiquette`,
+    native: `다음에 밥 한번 먹어요`,
+    romanized: `daeume bap hanbeon meogeoyo`,
+    literal: `“Let's eat rice once next time.”`,
+    failureRisk: `Context Blindness: Foreign students often take it as a concrete dinner invitation and feel ghosted later.`,
+    cultural: `“Let's catch up sometime! (warm conversational farewell).”`,
+    intent: `Signals friendliness and openness to future connection without locking in a real appointment.`,
+    explanation: `Food and shared meals sit at the heart of Korean relational warmth (정, jeong). “Have you eaten?” (식사하셨어요?) functions similarly as “How are you?”`,
+    trap: `Only treat it as an actual plan if the person follows up with specific dates or KakaoTalk scheduling.`
+  },
+  {
+    id: `ko-sugo`,
+    lang: `ko`,
+    langLabel: `Korean · 한국어`,
+    category: `hierarchy`,
+    categoryLabel: `Hierarchy & Work`,
+    native: `수고하셨습니다`,
+    romanized: `sugohasyeotseumnida`,
+    literal: `“You labored / worked hard.”`,
+    failureRisk: `Critical Honorific Trap: Despite its formal -습니다 ending, it implies evaluating someone's effort from above!`,
+    cultural: `“Good work today” (appropriate to peers, juniors, or service staff—NOT professors or bosses).`,
+    intent: `Acknowledges completed effort, but carries downward-or-peer status nuance.`,
+    explanation: `Many Korean learners rely on the polite ending and accidentally say 수고하셨습니다 to a professor after class, which can sound presumptuous.`,
+    trap: `To a professor, elder, or supervisor, ALWAYS use 감사합니다 (Thank you) or 고생 많으셨습니다 (You went through a lot of trouble).`
+  },
+  {
+    id: `ko-eoryeoul`,
+    lang: `ko`,
+    langLabel: `Korean · 한국어`,
+    category: `refusal`,
+    categoryLabel: `Indirect Refusal`,
+    native: `조금 어려울 것 같습니다`,
+    romanized: `jogeum eoryeoul geot gatseumnida`,
+    literal: `“It seems it will be a little difficult.”`,
+    failureRisk: `Directness Gap: Learners translate “I can't do it” directly as 안 돼요 (an dwaeyo), which sounds blunt or confrontational.`,
+    cultural: `“I'm afraid that may not be possible / I have to respectfully decline.”`,
+    intent: `Softens refusal via epistemic hedging (것 같습니다, “it seems”) and minimizer 조금 (“a little”).`,
+    explanation: `Combines apology/regret with indirect framing to safeguard the superior's or partner's face (체면, chemyeon).`,
+    trap: `Avoid bare 싫어요 (“I dislike/don't want”) or 안 돼요 (“No”) with lecturers or seniors.`
+  },
+  {
+    id: `ko-jalmeok`,
+    lang: `ko`,
+    langLabel: `Korean · 한국어`,
+    category: `cultural`,
+    categoryLabel: `Dining & Culture`,
+    native: `잘 먹겠습니다`,
+    romanized: `jal meokgesseumnida`,
+    literal: `“I will eat well.”`,
+    failureRisk: `Literal Awkwardness: Sounds boastful or odd in English rather than grateful.`,
+    cultural: `“Thank you for the meal — I'm really looking forward to enjoying it.”`,
+    intent: `Shows polite gratitude to whoever cooked or paid for the meal before eating.`,
+    explanation: `Followed after eating by 잘 먹었습니다 (“I ate well / Thank you for the lovely meal”), even at restaurants toward staff.`,
+    trap: `Do not omit it when a senior (선배, seonbae) or professor treats you—saying it beforehand is mandatory etiquette.`
+  },
+  {
+    id: `ko-seonbae`,
+    lang: `ko`,
+    langLabel: `Korean · 한국어`,
+    category: `hierarchy`,
+    categoryLabel: `Hierarchy & Work`,
+    native: `선배님, 식사하셨어요?`,
+    romanized: `seonbaenim, siksahashyeosseoyo?`,
+    literal: `“Senior, did you do a meal?”`,
+    failureRisk: `Semantic Mismatch: Uses honorific noun 식사 (meal) + honorific suffix -시- (hashyeosseoyo), not everyday 밥 먹었어?`,
+    cultural: `“How are you doing today, senior?” (caring relational greeting).`,
+    intent: `Combines hierarchy marker (-님) and subject honorific (-시-) with everyday care.`,
+    explanation: `Korean embeds age and seniority directly into vocabulary pairs: 밥 (plain meal) becomes 식사 (polite) or 진지 (elders); 먹다 (eat) becomes 드시다.`,
+    trap: `Never ask a professor or senior “밥 먹었어요?” using plain 밥—always elevate to 식사하셨어요?`
+  }
+];
+
+// =========================================================================
+// 2. SPEECH REGISTER & HONORIFIC SIMULATOR DATA
+// =========================================================================
+const REGISTER_DATA = {
+  ja: {
+    greet: {
+      high: {
+        tier: `Keigo / Sonkeigo · Honorific Formal`,
+        coords: `Status: Higher (Lecturer/Elder) · Distance: Formal`,
+        native: `先生、おはようございます。お変わりございませんか。`,
+        roman: `Sensei, ohayō gozaimasu. Okawari gozaimasen ka.`,
+        gloss: `“Good morning, Professor. I trust you have been well?”`,
+        morphemes: [
+          { token: `先生`, role: `Title`, note: `Respectful role title (Sensei) replaces personal pronouns like “you” (anata), which are avoided with superiors.` },
+          { token: `ございます`, role: `Polite Copula`, note: `Extra-polite equivalent of です (desu), elevating formal deference.` },
+          { token: `お変わり`, role: `Honorific Prefix お-`, note: `Honorific prefix お (o-) elevates the professor's state of health.` },
+          { token: `ございませんか`, role: `Humble/Polite Neg`, note: `Formal expression asking after well-being without intruding.` }
+        ],
+        warning: `Never use あなた (anata, “you”) or plain おはよう to a Japanese lecturer—always address by title (Sensei) + full gozaimasu.`
+      },
+      mid: {
+        tier: `Teineigo · Polite Standard (-masu / -desu)`,
+        coords: `Status: Peer / Acquaintance · Distance: Polite`,
+        native: `おはようございます。最近どうですか。`,
+        roman: `Ohayō gozaimasu. Saikin dō desu ka.`,
+        gloss: `“Good morning. How have things been lately?”`,
+        morphemes: [
+          { token: `おはようございます`, role: `Polite Greeting`, note: `Standard polite morning greeting safe for classmates, club seniors, and staff.` },
+          { token: `どう`, role: `Interrogative`, note: `Conversational “how”, softened by polite ending.` },
+          { token: `ですか`, role: `Teineigo Ending`, note: `Standard polite copula + question particle.` }
+        ],
+        warning: `Safe default for university classmates you do not know closely yet, or senior students (senpai).`
+      },
+      low: {
+        tier: `Futsūkei · Casual Plain Form`,
+        coords: `Status: Close Friend / Junior · Distance: Intimate`,
+        native: `おはよう！最近どう？`,
+        roman: `Ohayō! Saikin dō?`,
+        gloss: `“Morning! How's it going lately?”`,
+        morphemes: [
+          { token: `おはよう`, role: `Plain Greeting`, note: `Drops ございます (gozaimasu) to signal closeness and peer equality.` },
+          { token: `どう？`, role: `Rising Intonation`, note: `Drops ですか entirely; friendly rising tone replaces か.` }
+        ],
+        warning: `Only use with close peers or younger friends. Using this to a senpai or lecturer signals serious rudeness.`
+      }
+    },
+    request: {
+      high: {
+        tier: `Kenjōgo / Cushion Phrase · Humble Request`,
+        coords: `Status: Higher (Lecturer) · Distance: Formal`,
+        native: `恐れ入りますが、少しご相談させていただいてもよろしいでしょうか。`,
+        roman: `Osoreirimasu ga, sukoshi go-sōdan sasete itadaitemo yoroshii deshō ka.`,
+        gloss: `“I am terribly sorry to trouble you, but might I be permitted to consult with you briefly?”`,
+        morphemes: [
+          { token: `恐れ入りますが`, role: `Cushion (Kushon Kotoba)`, note: `Softening opener acknowledging imposition before making a request.` },
+          { token: `ご相談`, role: `Honorific ご-`, note: `Elevates the consultation as something granted by the professor.` },
+          { token: `させていただいても`, role: `Causative + Humble`, note: `Humbly asks permission to perform an action (“allow me to…”).` },
+          { token: `よろしいでしょうか`, role: `Elevated Question`, note: `Much softer and more respectful than いいですか.` }
+        ],
+        warning: `Direct imperatives or 〜てください (te kudasai) sound commanding to superiors; always frame as permission (〜てもよろしいでしょうか).`
+      },
+      mid: {
+        tier: `Teineigo · Polite Request`,
+        coords: `Status: Classmate / Senpai · Distance: Moderate`,
+        native: `すみません、ちょっと相談してもいいですか。`,
+        roman: `Sumimasen, chotto sōdan shitemo ii desu ka.`,
+        gloss: `“Excuse me, may I ask your advice for a moment?”`,
+        morphemes: [
+          { token: `すみません`, role: `Polite Attention`, note: `Softens interruption smoothly.` },
+          { token: `ちょっと`, role: `Minimizer`, note: `Makes the request feel small and easy to grant.` },
+          { token: `〜てもいいですか`, role: `Teineigo Permission`, note: `Polite and natural among fellow students.` }
+        ],
+        warning: `Appropriate for classmates and approachable seniors, though still too casual for formal emails to professors.`
+      },
+      low: {
+        tier: `Futsūkei · Casual Peer Request`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `ねえ、ちょっと相談乗ってくれる？`,
+        roman: `Nee, chotto sōdan notte kureru?`,
+        gloss: `“Hey, can you hear me out on something real quick?”`,
+        morphemes: [
+          { token: `ねえ`, role: `Casual Attention`, note: `Friendly opener among close friends.` },
+          { token: `乗ってくれる？`, role: `Plain Giving Verb`, note: `Uses plain くれる (“do for me”) without です/ます.` }
+        ],
+        warning: `Strictly for close friends. Never use ねえ to professors, elders, or service staff.`
+      }
+    },
+    refuse: {
+      high: {
+        tier: `Keigo · Deferential Indirect Refusal`,
+        coords: `Status: Higher (Lecturer/Manager) · Distance: Formal`,
+        native: `せっかくのお誘いなのですが、あいにく先約がございまして…。`,
+        roman: `Sekkaku no osasoi na no desu ga, aini-ku senyaku ga gozaimashite….`,
+        gloss: `“I truly appreciate your kind invitation, however unfortunately I have a prior commitment…”`,
+        morphemes: [
+          { token: `せっかくの`, role: `Appreciation Adjunct`, note: `Validates the kindness of the offer before declining.` },
+          { token: `あいにく`, role: `Regret Marker`, note: `“Unfortunately” — blames external schedule rather than personal unwillingness.` },
+          { token: `ございまして…`, role: `Trailing Softener`, note: `Leaves the refusal incomplete so the superior never hears a blunt “no”.` }
+        ],
+        warning: `Never reply with できません (“I cannot”) or 嫌です (“I don't want to”)—always leave space via gratitude + external constraint.`
+      },
+      mid: {
+        tier: `Teineigo · Polite Indirect Refusal`,
+        coords: `Status: Acquaintance / Colleague · Distance: Polite`,
+        native: `すみません、その日はちょっと都合が悪くて…。また今度ぜひ！`,
+        roman: `Sumimasen, sono hi wa chotto tsugō ga warukute…. Mata kondo zehi!`,
+        gloss: `“Sorry, that day doesn't quite work for me… Definitely another time!”`,
+        morphemes: [
+          { token: `すみません`, role: `Apology Adjunct`, note: `Opens with regret.` },
+          { token: `都合が悪くて`, role: `Vague Excuse`, note: `“Inconvenient” avoids exposing personal details while sounding polite.` },
+          { token: `また今度ぜひ`, role: `Harmony Closer`, note: `Signals goodwill for future interaction.` }
+        ],
+        warning: `Matches the classic regret + vague reason + positive closing pattern.`
+      },
+      low: {
+        tier: `Futsūkei · Casual Peer Refusal`,
+        coords: `Status: Close Friend · Distance: Intimate`,
+        native: `ごめん、その日は無理かも！またにしよう。`,
+        roman: `Gomen, sono hi wa muri kamo! Mata ni shiyō.`,
+        gloss: `“Sorry, I probably can't make that day! Let's do another time.”`,
+        morphemes: [
+          { token: `ごめん`, role: `Casual Sorry`, note: `Shortened peer apology.` },
+          { token: `無理かも`, role: `Softened “Impossible”`, note: `かも (“might be”) softens 無理 (“impossible”) among friends.` }
+        ],
+        warning: `Direct 無理 (muri) without softening can still feel abrupt outside very close friendships.`
+      }
+    },
+    thank: {
+      high: {
+        tier: `Keigo · Formal Gratitude`,
+        coords: `Status: Higher (Lecturer/Elder) · Distance: Formal`,
+        native: `お忙しいところ、誠にありがとうございました。`,
+        roman: `Oisogashii tokoro, makoto ni arigatō gozaimashita.`,
+        gloss: `“Thank you sincerely for sparing time out of your busy schedule.”`,
+        morphemes: [
+          { token: `お忙しいところ`, role: `Time Consideration`, note: `Explicitly honors the listener's busy schedule.` },
+          { token: `誠に`, role: `Formal Intensifier`, note: `Elevates sincerity beyond everyday 本当に.` },
+          { token: `ございました`, role: `Past Polite Gratitude`, note: `Past tense thanks for completed help.` }
+        ],
+        warning: `Past tense ありがとうございました is required when thanking for help just finished.`
+      },
+      mid: {
+        tier: `Teineigo · Standard Polite Thanks`,
+        coords: `Status: Peer / Staff · Distance: Polite`,
+        native: `本当にありがとうございました。助かりました。`,
+        roman: `Hontō ni arigatō gozaimashita. Tasukarimashita.`,
+        gloss: `“Thank you so much. You really saved me!”`,
+        morphemes: [
+          { token: `本当に`, role: `Sincere Intensifier`, note: `Natural warmth without stiffness.` },
+          { token: `助かりました`, role: `Relational Relief`, note: `“I was helped/rescued” — deeply natural Japanese way to show impact.` }
+        ],
+        warning: `Adding 助かりました makes your gratitude sound far more authentic than ありがとう alone.`
+      },
+      low: {
+        tier: `Futsūkei · Casual Thanks`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `ほんとありがとう！めっちゃ助かった！`,
+        roman: `Honto arigatō! Meccha tasukatta!`,
+        gloss: `“Thanks so much! Huge lifesaver!”`,
+        morphemes: [
+          { token: `ありがとう`, role: `Plain Thanks`, note: `Drops ございます for warmth among friends.` },
+          { token: `めっちゃ助かった`, role: `Colloquial Relief`, note: `Youth/casual phrasing expressing strong relief.` }
+        ],
+        warning: `Never use めっちゃ or plain ありがとう with teachers, seniors, or strangers.`
+      }
+    }
+  },
+  ko: {
+    greet: {
+      high: {
+        tier: `Hasipsio-che · Formal Deferential (-습니다/ㅂ니다)`,
+        coords: `Status: Higher (Professor/Director) · Distance: Formal`,
+        native: `교수님, 안녕하십니까? 그동안 잘 지내셨습니까?`,
+        roman: `Gyosunim, annyeonghasimnikka? Geudongan jal jinaesyeotseumnikka?`,
+        gloss: `“Hello, Professor. Have you been keeping well?”`,
+        morphemes: [
+          { token: `교수님`, role: `Title + -님`, note: `Professional title + honorific suffix -님 replaces second-person pronoun “you”.` },
+          { token: `-시- (십니까)`, role: `Subject Honorific`, note: `Infix -시- elevates the professor as the subject of the action.` },
+          { token: `-셨습니까`, role: `Formal Interrogative`, note: `Highest standard formal ending for academic and business settings.` }
+        ],
+        warning: `Never use 너 (neo, “you”) or drop -시- when asking a professor about their well-being.`
+      },
+      mid: {
+        tier: `Haeyo-che · Polite Standard (-아/어요)`,
+        coords: `Status: Senior / Acquaintance · Distance: Polite`,
+        native: `안녕하세요! 요즘 어떻게 지내세요?`,
+        roman: `Annyeonghaseyo! Yojeum eotteoke jinaeseyo?`,
+        gloss: `“Hello! How have you been doing lately?”`,
+        morphemes: [
+          { token: `안녕하세요`, role: `Polite Standard`, note: `Warm and polite everyday greeting across campus and shops.` },
+          { token: `지내세요`, role: `Honorific + -요`, note: `Includes -세- (-시- + 어요) for gentle respect toward peers or seniors.` }
+        ],
+        warning: `Haeyo-che is your safest everyday register in Korea with strangers, classmates, and acquaintances.`
+      },
+      low: {
+        tier: `Hae-che / Banmal · Casual Intimate`,
+        coords: `Status: Close Friend / Younger · Distance: Intimate`,
+        native: `안녕! 요즘 잘 지내?`,
+        roman: `Annyeong! Yojeum jal jinae?`,
+        gloss: `“Hey! Doing well lately?”`,
+        morphemes: [
+          { token: `안녕`, role: `Plain Greeting`, note: `Drops -하세요 entirely; only for close friends of the same age or younger.` },
+          { token: `지내?`, role: `Banmal Ending`, note: `Drops -요; signals closeness and zero hierarchy gap.` }
+        ],
+        warning: `Using Banmal without explicit mutual agreement (말 놓기) with someone even 1 year older is a major social violation in Korean.`
+      }
+    },
+    request: {
+      high: {
+        tier: `Hasipsio-che + Humble Verb · Deferential Request`,
+        coords: `Status: Higher (Professor) · Distance: Formal`,
+        native: `교수님, 죄송하지만 잠깐 여쭤봐도 되겠습니까?`,
+        roman: `Gyosunim, joesonghajiman jamkkan yeojjwobwado doegetseumnikka?`,
+        gloss: `“Professor, I apologize for troubling you, may I briefly ask a question?”`,
+        morphemes: [
+          { token: `죄송하지만`, role: `Apology Cushion`, note: `Formal “I'm sorry, but…” prepares the superior for a request.` },
+          { token: `여쭤봐도`, role: `Humble Verb (여쭙다)`, note: `Replaces plain 물어보다 (“ask”) with humble verb 여쭙다 when asking elders/professors.` },
+          { token: `되겠습니까`, role: `Polite Permission`, note: `Indirectly seeks permission rather than demanding an answer.` }
+        ],
+        warning: `Using 물어보다 instead of 여쭙다 to a professor sounds unpolished; lexical substitution matters as much as verb endings.`
+      },
+      mid: {
+        tier: `Haeyo-che · Polite Request`,
+        coords: `Status: Classmate / Senpai · Distance: Polite`,
+        native: `실례지만 잠깐 물어봐도 될까요?`,
+        roman: `Sillyejiman jamkkan mureobwado doelkkayo?`,
+        gloss: `“Excuse me, could I ask you something quickly?”`,
+        morphemes: [
+          { token: `실례지만`, role: `Polite Opener`, note: `“Excuse me, but…” — polite without being overly heavy.` },
+          { token: `물어봐도`, role: `Standard Verb`, note: `Appropriate with fellow students or peers.` },
+          { token: `-ㄹ까요`, role: `Soft Question`, note: `Gentle consultative ending.` }
+        ],
+        warning: `Polite and natural for peers; switch to 죄송하지만 + 여쭤봐도 for lecturers.`
+      },
+      low: {
+        tier: `Banmal · Casual Request`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `야, 잠깐만 물어볼 게 있어.`,
+        roman: `Ya, jamkkanman mureobol ge isseo.`,
+        gloss: `“Hey, got something quick to ask you.”`,
+        morphemes: [
+          { token: `야`, role: `Casual Call`, note: `Only among close same-age friends or juniors.` },
+          { token: `있어`, role: `Plain Ending`, note: `Drops -요 to express intimacy.` }
+        ],
+        warning: `Calling someone 야 (ya) who is older or unfamiliar is considered rude.`
+      }
+    },
+    refuse: {
+      high: {
+        tier: `Hasipsio-che · Mitigated Indirect Refusal`,
+        coords: `Status: Higher (Professor/Manager) · Distance: Formal`,
+        native: `말씀은 감사하지만, 그날은 선약이 있어서 참석이 어려울 것 같습니다.`,
+        roman: `Malsseumeun gamsahajiman, geunareun seonyagi isseoseo chamseogi eoryeoul geot gatseumnida.`,
+        gloss: `“Thank you for your kind words, however I have a prior engagement that day so attending may be difficult.”`,
+        morphemes: [
+          { token: `말씀은 감사하지만`, role: `Gratitude Adjunct`, note: `Uses honorific noun 말씀 (“your words”) + appreciation.` },
+          { token: `선약이 있어서`, role: `External Reason`, note: `Attributes inability to prior schedule rather than personal reluctance.` },
+          { token: `어려울 것 같습니다`, role: `Epistemic Hedge`, note: `“It seems difficult” avoids blunt negation.` }
+        ],
+        warning: `Never use 못 해요 (“I can't”) or 싫어요 (“I don't want to”) to a superior.`
+      },
+      mid: {
+        tier: `Haeyo-che · Polite Softened Refusal`,
+        coords: `Status: Peer / Acquaintance · Distance: Polite`,
+        native: `죄송한데 그날은 조금 힘들 것 같아요. 다음에 꼭 같이 해요!`,
+        roman: `Joesonghande geunareun jogeum himdeul geot gatayo. Daeume kkok gachi haeyo!`,
+        gloss: `“I'm sorry, that day might be a bit tough for me. Let's definitely do it next time!”`,
+        morphemes: [
+          { token: `죄송한데`, role: `Regret Lead-in`, note: `Soft apology + background particle -ㄴ데.` },
+          { token: `조금 힘들 것 같아요`, role: `Minimizer + Hedge`, note: `“A little tough, it seems” — classic Korean indirect decline.` },
+          { token: `다음에 꼭`, role: `Future Promise`, note: `Preserves relational warmth.` }
+        ],
+        warning: `Reflects the same Regret + Explanation + Future Alternative sequence prized in Malaysian and East Asian pragmatics.`
+      },
+      low: {
+        tier: `Banmal · Casual Peer Refusal`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `미안, 그날은 안 될 것 같아. 담에 보자!`,
+        roman: `Mian, geunareun an doel geot gata. Dame boja!`,
+        gloss: `“Sorry, don't think I can make that day. Catch you next time!”`,
+        morphemes: [
+          { token: `미안`, role: `Casual Apology`, note: `Used only with close peers/juniors (never say 미안해요 to superiors—use 죄송합니다).` },
+          { token: `것 같아`, role: `Soft Hedge`, note: `Even with close friends, Koreans soften refusals with 것 같아.` }
+        ],
+        warning: `미안 (mian) is strictly casual/downward; always use 죄송 (joesong) upward.`
+      }
+    },
+    thank: {
+      high: {
+        tier: `Hasipsio-che · Formal Gratitude`,
+        coords: `Status: Higher (Professor/Elder) · Distance: Formal`,
+        native: `바쁘신데 시간 내주셔서 진심으로 감사드립니다.`,
+        roman: `Bappeusinde sigan naejusyeoseo jinsimeuro gamsadeurimnida.`,
+        gloss: `“Thank you sincerely for making time despite being busy.”`,
+        morphemes: [
+          { token: `바쁘신데`, role: `Honorific -시-`, note: `Acknowledges the superior's busy schedule respectfully.` },
+          { token: `내주셔서`, role: `Honorific Benefactive`, note: `“Having graciously given time for me.”` },
+          { token: `감사드립니다`, role: `Humble Verb (드리다)`, note: `Replaces 하다 with humble 드리다 (“offer thanks”).` }
+        ],
+        warning: `Avoid 수고하셨습니다 to professors; 감사드립니다 is the gold standard.`
+      },
+      mid: {
+        tier: `Haeyo-che · Polite Gratitude`,
+        coords: `Status: Peer / Acquaintance · Distance: Polite`,
+        native: `정말 감사해요! 덕분에 큰 도움이 됐어요.`,
+        roman: `Jeongmal gamsahaeyo! Deokbune keun doumi dwaesseoyo.`,
+        gloss: `“Thank you really! Thanks to you, it was a huge help.”`,
+        morphemes: [
+          { token: `감사해요`, role: `Polite Standard`, note: `Warm and natural across peers and seniors.` },
+          { token: `덕분에`, role: `Attribution Noun`, note: `“Thanks to your favor/grace” — positive relational credit.` }
+        ],
+        warning: `Using 덕분에 (“thanks to you”) elevates warmth considerably.`
+      },
+      low: {
+        tier: `Banmal · Casual Gratitude`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `진짜 고마워! 덕분에 살았다!`,
+        roman: `Jinjja gomawo! Deokbune saratda!`,
+        gloss: `“Thanks so much! You saved me!”`,
+        morphemes: [
+          { token: `고마워`, role: `Native Casual Thanks`, note: `Native Korean 고맙다 feels warmer and more intimate than Sino-Korean 감사하다.` },
+          { token: `살았다`, role: `Idiomatic Relief`, note: `Literally “I lived!” — playful relief among friends.` }
+        ],
+        warning: `고마워 without -요 is strictly for close friends or juniors.`
+      }
+    }
+  },
+  zh: {
+    greet: {
+      high: {
+        tier: `Deferential Formal · 敬语称谓`,
+        coords: `Status: Higher (Lecturer/Elder) · Distance: Formal`,
+        native: `老师您好，请问您最近身体还好吗？`,
+        roman: `Lǎoshī nín hǎo, qǐngwèn nín zuìjìn shēntǐ hái hǎo ma?`,
+        gloss: `“Hello Teacher/Professor, may I ask if you have been keeping well recently?”`,
+        morphemes: [
+          { token: `老师`, role: `Role Honorific`, note: `Professional/academic title always precedes the greeting.` },
+          { token: `您`, role: `Honorific Pronoun`, note: `Elevated form of 你 (nǐ) used exclusively for superiors, elders, and guests.` },
+          { token: `请问`, role: `Polite Inquiry Opener`, note: `Literally “please allow me to ask” — softens any question.` }
+        ],
+        warning: `Using 你好 (nǐ hǎo) instead of 您好 (nín hǎo) or omitting 老师 sounds abrupt in formal Chinese academic culture.`
+      },
+      mid: {
+        tier: `Polite Standard · 礼貌客气`,
+        coords: `Status: Classmate / Acquaintance · Distance: Moderate`,
+        native: `你好，最近学习忙不忙呀？`,
+        roman: `Nǐ hǎo, zuìjìn xuéxí máng bu máng ya?`,
+        gloss: `“Hi, have your studies been busy lately?”`,
+        morphemes: [
+          { token: `你好`, role: `Standard Greeting`, note: `Neutral polite greeting for peers and acquaintances.` },
+          { token: `呀`, role: `Softening Particle`, note: `Sentence-final modal particle softens the question tone.` }
+        ],
+        warning: `Safe and natural among university peers and unfamiliar students.`
+      },
+      low: {
+        tier: `Casual Peer · 熟人亲切`,
+        coords: `Status: Close Friend · Distance: Intimate`,
+        native: `嗨，吃了吗？最近咋样？`,
+        roman: `Hāi, chī le ma? Zuìjìn zǎyàng?`,
+        gloss: `“Hey, eaten yet? How's it going lately?”`,
+        morphemes: [
+          { token: `吃了吗`, role: `Relational Care`, note: `Traditional warm check-in—not an actual meal offer.` },
+          { token: `咋样`, role: `Colloquial`, note: `Casual contraction of 怎么样 (“how's things”).` }
+        ],
+        warning: `Strictly for close friends; never use 咋样 with a lecturer.`
+      }
+    },
+    request: {
+      high: {
+        tier: `Deferential Formal · 敬语请求`,
+        coords: `Status: Higher (Lecturer) · Distance: Formal`,
+        native: `老师您好，不好意思打扰您，请问方便向您请教一个问题吗？`,
+        roman: `Lǎoshī nín hǎo, bùhǎoyìsi dǎrǎo nín, qǐngwèn fāngbiàn xiàng nín qǐngjiào yīgè wèntí ma?`,
+        gloss: `“Hello Professor, sorry to disturb you—might it be convenient to seek your guidance on a question?”`,
+        morphemes: [
+          { token: `不好意思打扰您`, role: `Apologetic Opener`, note: `Explicitly acknowledges imposition before asking.` },
+          { token: `方便…吗`, role: `Face-Saving Frame`, note: `Asks “is it convenient?” so the lecturer can decline easily if busy.` },
+          { token: `请教`, role: `Humble Verb`, note: `Replaces 问 (“ask”) with respectful “humbly seek instruction”.` }
+        ],
+        warning: `Avoid saying “老师，我要问你…” (“Teacher, I want to ask you…”)—it sounds demanding.`
+      },
+      mid: {
+        tier: `Polite Standard · 礼貌请求`,
+        coords: `Status: Classmate / Peer · Distance: Moderate`,
+        native: `同学你好，麻烦问一下，这份资料可以发我一份吗？`,
+        roman: `Tóngxué nǐ hǎo, máfan wèn yīxià, zhè fèn zīliào kěyǐ fā wǒ yī fèn ma?`,
+        gloss: `“Hi classmate, sorry to trouble you, could you send me a copy of this material?”`,
+        morphemes: [
+          { token: `麻烦问一下`, role: `Mitigator`, note: `一下 (“a bit”) minimizes the burden of the request.` },
+          { token: `可以…吗`, role: `Polite Modal`, note: `Courteous peer request frame.` }
+        ],
+        warning: `Adding 一下 (yīxià) and 麻烦 immediately softens Chinese requests.`
+      },
+      low: {
+        tier: `Casual Peer · 好友口语`,
+        coords: `Status: Close Friend · Distance: Intimate`,
+        native: `帮个忙呗，把笔记发我看看！`,
+        roman: `Bāng gè máng bei, bǎ bǐjì fā wǒ kànkan!`,
+        gloss: `“Do me a solid and send me your notes to look at!”`,
+        morphemes: [
+          { token: `呗`, role: `Casual Particle`, note: `Playful persuasion among close friends.` },
+          { token: `看看`, role: `Verb Reduplication`, note: `Reduplicating 看 softens the action casually.` }
+        ],
+        warning: `Using 呗 (bei) to a lecturer or elder sounds disrespectful.`
+      }
+    },
+    refuse: {
+      high: {
+        tier: `Deferential Formal · 委婉拒绝`,
+        coords: `Status: Higher (Lecturer/Manager) · Distance: Formal`,
+        native: `非常感谢您的邀请，不过我那天刚好有别的安排，实在不好意思。`,
+        roman: `Fēicháng gǎnxiè nín de yāoqǐng, bùguò wǒ nàtiān gānghǎo yǒu biéde ānpái, shízài bùhǎoyìsi.`,
+        gloss: `“Thank you very much for your invitation, however I happen to have another commitment that day—I'm truly sorry.”`,
+        morphemes: [
+          { token: `非常感谢您的邀请`, role: `Gratitude Adjunct`, note: `Yan & Bidin (2025): Chinese speakers use Gratitude (16.10%) heavily to cushion refusals.` },
+          { token: `刚好有别的安排`, role: `External Constraint`, note: `Blames schedule conflict rather than disinterest.` },
+          { token: `实在不好意思`, role: `Regret Closer`, note: `Reinforces deference and goodwill.` }
+        ],
+        warning: `Never reply with “我不行” or “我不想去” to a professor or manager.`
+      },
+      mid: {
+        tier: `Polite Standard · 委婉推辞`,
+        coords: `Status: Classmate / Acquaintance · Distance: Moderate`,
+        native: `不好意思啊，这周末不太方便，要不我们下周再约？`,
+        roman: `Bùhǎoyìsi a, zhè zhōumò bùtài fāngbiàn, yàobù wǒmen xiàzhōu zài yuē?`,
+        gloss: `“Sorry, this weekend isn't quite convenient—how about we plan for next week instead?”`,
+        morphemes: [
+          { token: `不太方便`, role: `Indirect Negative`, note: `“Not very convenient” avoids a hard “no”.` },
+          { token: `要不…再约`, role: `Statement of Alternative`, note: `Reflects the top Chinese mitigating pair: Excuse + Alternative (13.56%).` }
+        ],
+        warning: `Offering an alternative protects relationship harmony even when declining.`
+      },
+      low: {
+        tier: `Casual Peer · 直接柔和`,
+        coords: `Status: Close Friend · Distance: Close`,
+        native: `哎呀抱歉，这周真去不了，下次我请客！`,
+        roman: `Āiyā bàoqiàn, zhè zhōu zhēn qù bù liǎo, xiàcì wǒ qǐngkè!`,
+        gloss: `“Ah sorry, really can't make it this week—next time's on me!”`,
+        morphemes: [
+          { token: `去不了`, role: `Potential Complement`, note: `“Unable to go” frames inability rather than refusal.` },
+          { token: `下次我请客`, role: `Future Compensation`, note: `Playful goodwill gesture typical of Malaysian & Chinese peer bonding.` }
+        ],
+        warning: `Warm and natural among close friends; keep formal excuse frames for seniors.`
+      }
+    },
+    thank: {
+      high: {
+        tier: `Deferential Formal · 正式致谢`,
+        coords: `Status: Higher (Lecturer/Elder) · Distance: Formal`,
+        native: `太感谢您的耐心指导了，辛苦您了！`,
+        roman: `Tài gǎnxiè nín de nàixīn zhǐdǎo le, xīnkǔ nín le!`,
+        gloss: `“Thank you so much for your patient guidance—truly appreciate your hard work!”`,
+        morphemes: [
+          { token: `您的耐心指导`, role: `Specific Recognition`, note: `Naming the specific kindness (“patient guidance”) deepens respect.` },
+          { token: `辛苦您了`, role: `Effort Acknowledgment`, note: `Culturally resonant closing toward teachers.` }
+        ],
+        warning: `Use 您 throughout when thanking a professor.`
+      },
+      mid: {
+        tier: `Polite Standard · 礼貌致谢`,
+        coords: `Status: Classmate / Staff · Distance: Polite`,
+        native: `谢谢你帮我这么大忙，真是麻烦你了！`,
+        roman: `Xièxie nǐ bāng wǒ zhème dà máng, zhēnshì máfan nǐ le!`,
+        gloss: `“Thank you for helping me so much—really sorry for the trouble!”`,
+        morphemes: [
+          { token: `帮我这么大忙`, role: `Impact Praise`, note: `Emphasizes gratitude for the size of help.` },
+          { token: `麻烦你了`, role: `Polite Softener`, note: `Acknowledges imposition politely.` }
+        ],
+        warning: `Natural across campus and everyday service interactions.`
+      },
+      low: {
+        tier: `Casual Peer · 好友致谢`,
+        coords: `Status: Close Friend · Distance: Intimate`,
+        native: `谢啦兄弟/姐妹，太够意思了！`,
+        roman: `Xiè la xiōngdì/jiěmèi, tài gòuyìsi le!`,
+        gloss: `“Thanks buddy, you're a real one!”`,
+        morphemes: [
+          { token: `谢啦`, role: `Casual Particle 啦`, note: `Light, upbeat peer thanks.` },
+          { token: `够意思`, role: `Solidarity Idiom`, note: `Praises loyalty and friendship.` }
+        ],
+        warning: `Strictly casual peer register.`
+      }
+    }
+  }
+};
+
+// =========================================================================
+// 3. ROLEPLAY SCENARIOS DATA (Multi-Language Support)
+// =========================================================================
+const ROLEPLAY_SCENARIOS = [
+  {
+    id: `rp-lecturer`,
+    title: `Greeting & Consulting a Lecturer`,
+    context: `Academic · High Status · Distant`,
+    setting: `You run into your East Asian Studies lecturer in the faculty corridor and want to ask for 5 minutes to discuss your essay draft.`,
+    langs: {
+      zh: {
+        npcName: `Prof. Chen (陈教授)`,
+        npcLine: `你好！正要去开会，有什么事吗？`,
+        npcRoman: `Nǐ hǎo! Zhèng yào qù kāihuì, yǒu shénme shì ma?`,
+        npcEn: `“Hello! I'm just heading to a meeting—is there something you needed?”`,
+        choices: [
+          {
+            label: `Option A · Deferential & Face-Saving`,
+            native: `陈教授您好！不好意思打扰您，请问您开完会方便让我请教一下论文吗？`,
+            roman: `Chén jiàoshòu nín hǎo! Bùhǎoyìsi dǎrǎo nín, qǐngwèn nín kāiwán huì fāngbiàn ràng wǒ qǐngjiào yīxià lùnwén ma?`,
+            good: true,
+            severity: 1,
+            reaction: `Prof. Chen smiles warmly: “没问题，下午两点来我办公室吧！” (No problem, come by my office at 2pm!)`,
+            explain: `You addressed the lecturer by surname + title (陈教授), used 您 (nín), apologized for interrupting, and asked when it is convenient after the meeting.`
+          },
+          {
+            label: `Option B · Direct Literal Translation`,
+            native: `你好，我想问你五分钟关于我的文章，可以吗？`,
+            roman: `Nǐ hǎo, wǒ xiǎng wèn nǐ wǔ fēnzhōng guānyú wǒ de wénzhāng, kěyǐ ma?`,
+            good: false,
+            severity: 3,
+            reaction: `Prof. Chen pauses slightly: “我现在赶时间，你发邮件吧。” (I'm in a rush right now, just email me.)`,
+            explain: `Pragmatic Failure (Li, 2023): Using 你 instead of 您/教授 and ignoring the fact that the lecturer just said they are heading to a meeting comes off as pushy.`
+          },
+          {
+            label: `Option C · Casual Peer Register`,
+            native: `嗨老师，等一下有空吗？帮我看下作业呗！`,
+            roman: `Hāi lǎoshī, děng yīxià yǒukòng ma? Bāng wǒ kàn xià zuòyè bei!`,
+            good: false,
+            severity: 5,
+            reaction: `Prof. Chen frowns politely: “请先发正式邮件预约。” (Please send a formal email to book an appointment.)`,
+            explain: `Severe Register Mismatch: “嗨” and “呗” belong to close peer banter and violate hierarchical distance.`
+          }
+        ]
+      },
+      ja: {
+        npcName: `Prof. Tanaka (田中先生)`,
+        npcLine: `あ、こんにちは。これから会議なんですが、何か用ですか？`,
+        npcRoman: `A, konnichiwa. Korekara kaigi nan desu ga, nani ka yō desu ka?`,
+        npcEn: `“Oh, hello. I'm heading into a meeting shortly—did you need something?”`,
+        choices: [
+          {
+            label: `Option A · Humble Keigo & Schedule Respect`,
+            native: `田中先生、お忙しいところ恐れ入ります。会議の後にお時間よろしいでしょうか。`,
+            roman: `Tanaka sensei, oisogashii tokoro osoreirimasu. Kaigi no ato ni ojikan yoroshii deshō ka.`,
+            good: true,
+            severity: 1,
+            reaction: `Prof. Tanaka nods appreciatively: 「ええ、三時ごろ研究室に来てください。」 (Yes, please come to my office around 3pm.)`,
+            explain: `Using お忙しいところ恐れ入ります acknowledges their rush, and asking after the meeting respects hierarchy and social distance.`
+          },
+          {
+            label: `Option B · Literal Textbook Translation`,
+            native: `こんにちは。私のレポートについて質問したいですが、いいですか？`,
+            roman: `Konnichiwa. Watashi no repōto ni tsuite shitsumon shitai desu ga, ii desu ka?`,
+            good: false,
+            severity: 3,
+            reaction: `Prof. Tanaka checks their watch: 「今はちょっと難しいですね…メールでお願いします。」 (Right now is a bit difficult… please email me.)`,
+            explain: `Polite grammar (-ます) alone is insufficient when ignoring the cue that the professor is rushing to a meeting.`
+          },
+          {
+            label: `Option C · Casual Plain Form`,
+            native: `先生、今ちょっといい？レポート見てほしいんだけど！`,
+            roman: `Sensei, ima chotto ii? Repōto mite hoshii n da kedo!`,
+            good: false,
+            severity: 5,
+            reaction: `Prof. Tanaka looks taken aback: 「敬語を使いましょうね。後でメールしてください。」 (Let's remember polite language. Email me later.)`,
+            explain: `Severe Pragmatic Failure: Dropping -ます/-です (Futsūkei) to a Japanese lecturer breaks fundamental academic hierarchy.`
+          }
+        ]
+      },
+      ko: {
+        npcName: `Prof. Park (박 교수님)`,
+        npcLine: `어, 안녕하세요. 지금 회의 들어가야 하는데 무슨 일이에요?`,
+        npcRoman: `Eo, annyeonghaseyo. Jigeum hoeui deureogaya haneunde museun irieyo?`,
+        npcEn: `“Oh, hello. I have to go into a meeting right now—what's up?”`,
+        choices: [
+          {
+            label: `Option A · Hasipsio-che + Humble Verb`,
+            native: `교수님, 바쁘신데 죄송합니다! 회의 끝나신 후에 잠깐 여쭤봐도 되겠습니까?`,
+            roman: `Gyosunim, bappeusinde joesonghamnida! Hoeui kkeutnasin hue jamkkan yeojjwobwado doegetseumnikka?`,
+            good: true,
+            severity: 1,
+            reaction: `Prof. Park smiles: “네, 고마워요. 3시에 연구실로 와요.” (Yes, thank you. Come to my office at 3.)`,
+            explain: `Combines 바쁘신데 (honorific acknowledgment), 죄송합니다, and humble 여쭤보다 (“ask a superior”) after the meeting.`
+          },
+          {
+            label: `Option B · Condescending Trap (수고하세요)`,
+            native: `네, 회의 수고하세요! 끝나고 물어볼게요.`,
+            roman: `Ne, hoeui sugohaseyo! Kkeutnago mureobolgeyo.`,
+            good: false,
+            severity: 4,
+            reaction: `Prof. Park looks awkward: “어… 네, 나중에 이메일 보내세요.” (Uh… okay, send an email later.)`,
+            explain: `Classic Learner Trap: 수고하세요 (“work hard”) carries a downward status nuance and should not be said to a professor!`
+          },
+          {
+            label: `Option C · Banmal Register`,
+            native: `교수님, 잠깐만 물어볼 게 있어!`,
+            roman: `Gyosunim, jamkkanman mureobol ge isseo!`,
+            good: false,
+            severity: 5,
+            reaction: `Prof. Park pauses sternly: “잠깐만요, 예의를 지켜야죠.” (Excuse me, please maintain proper courtesy.)`,
+            explain: `Severe Pragmatic Failure: Ending in Banmal (-있어) to a Korean professor violates deep age and status norms.`
+          }
+        ]
+      }
+    }
+  },
+  {
+    id: `rp-refusal`,
+    title: `Polite Indirect Refusal to a Senior / Manager`,
+    context: `Internship · High Status · Face-Threatening`,
+    setting: `Your internship supervisor asks you to stay late tonight to cover an extra task, but you already have an assessed university presentation tomorrow morning.`,
+    langs: {
+      zh: {
+        npcName: `Manager Lin (林经理)`,
+        npcLine: `小李，今晚能加个班帮忙整理这份报告吗？`,
+        npcRoman: `Xiǎo Lǐ, jīnwǎn néng jiā gè bān bāngmáng zhěnglǐ zhè fèn bàogào ma?`,
+        npcEn: `“Xiao Li, can you work overtime tonight to help organize this report?”`,
+        choices: [
+          {
+            label: `Option A · Gratitude + External Reason + Alternative`,
+            native: `林经理，感谢您的信任！只是明早有毕业答辩，今晚实在走不开，明天一早提前来帮您处理可以吗？`,
+            roman: `Lín jīnglǐ, gǎnxiè nín de xìnrèn! Zhǐshì míngzǎo yǒu bìyè dábiàn, jīnwǎn shízài zǒu bù kāi, míngtiān yīzǎo tíqián lái bāng nín chǔlǐ kěyǐ ma?`,
+            good: true,
+            severity: 1,
+            reaction: `Manager Lin nods: “答辩更重要，那就明天早上九点前给我吧！” (Your defense is more important—just get it to me by 9am tomorrow!)`,
+            explain: `Mirrors the Yan & Bidin (2025) optimal Chinese refusal formula: Gratitude + Specific Reason + Statement of Alternative.`
+          },
+          {
+            label: `Option B · Blunt Negative Willingness`,
+            native: `对不起，今晚我不能加班，我明天有报告。`,
+            roman: `Duìbuqǐ, jīnwǎn wǒ bù néng jiābān, wǒ míngtiān yǒu bàogào.`,
+            good: false,
+            severity: 4,
+            reaction: `Manager Lin looks slightly displeased: “知道了，我找别人吧。” (Understood, I'll ask someone else.)`,
+            explain: `Direct refusal (“我不能”) without offering gratitude or an alternative damages workplace rapport and threatens the manager's face.`
+          },
+          {
+            label: `Option C · Unmitigated Direct “No”`,
+            native: `不行，我下班后还有自己的事要做。`,
+            roman: `Bù xíng, wǒ xiàbān hòu hái yǒu zìjǐ de shì yào zuò.`,
+            good: false,
+            severity: 5,
+            reaction: `Manager Lin goes silent: “好，那你先回去吧。” (Fine, head home then.)`,
+            explain: `High Face-Threat (Yan & Bidin 2025): Flat “不行” (No) to a manager creates sharp relational friction.`
+          }
+        ]
+      },
+      ja: {
+        npcName: `Supervisor Sato (佐藤先輩)`,
+        npcLine: `すみません、今日の夜少し残業してこの資料をお願いできますか？`,
+        npcRoman: `Sumimasen, kyō no yoru sukoshi zangyō shite kono shiryō o onegai dekimasu ka?`,
+        npcEn: `“Sorry, could I ask you to stay a bit late tonight to finish these slides?”`,
+        choices: [
+          {
+            label: `Option A · Apology + Constraint + Alternative`,
+            native: `申し訳ございません、明日の朝に大学の発表がありまして…。明日の朝早く出社して対応してもよろしいでしょうか。`,
+            roman: `Mōshiwake gozaimasen, ashita no asa ni daigaku no happyō ga arimashite…. Ashita no asa hayaku shussha shite taiō shitemo yoroshii deshō ka.`,
+            good: true,
+            severity: 1,
+            reaction: `Sato smiles gently: 「あ、発表があるんですね！じゃあ明日の朝お願いします。」 (Oh, you have a presentation! Tomorrow morning is totally fine.)`,
+            explain: `Uses formal apology (申し訳ございません), trailing softening (〜ありまして…), and a proactive alternative.`
+          },
+          {
+            label: `Option B · Direct Refusal`,
+            native: `いいえ、今日は残業できません。明日テストがありますから。`,
+            roman: `Iie, kyō wa zangyō dekimasen. Ashita tesuto ga arimasu kara.`,
+            good: false,
+            severity: 4,
+            reaction: `Sato blinks awkwardly: 「あ…そうですか。分かりました。」 (Oh… I see. Understood.)`,
+            explain: `Starting with いいえ (“No”) and stating できません (“cannot”) + から (“because”) feels overly blunt and confrontational in Japanese.`
+          },
+          {
+            label: `Option C · Casual Excuse`,
+            native: `ごめん、今日はちょっと無理です！`,
+            roman: `Gomen, kyō wa chotto muri desu!`,
+            good: false,
+            severity: 5,
+            reaction: `Sato looks uncomfortable: 「もう少し丁寧にお願いしますね。」 (Please speak a bit more politely.)`,
+            explain: `Mixing casual ごめん with workplace hierarchy breaches professional decorum.`
+          }
+        ]
+      },
+      ko: {
+        npcName: `Team Lead Kim (김 팀장님)`,
+        npcLine: `오늘 저녁에 조금 남아서 이 보고서 정리 좀 도와줄 수 있어요?`,
+        npcRoman: `Oneul jeonyeoge jogeum namaseo i bogoseo jeongni jom dowajul su isseoyo?`,
+        npcEn: `“Could you stay a bit this evening to help organize this report?”`,
+        choices: [
+          {
+            label: `Option A · Regret + Epistemic Hedge + Alternative`,
+            native: `팀장님, 정말 죄송하지만 내일 아침에 중요한 학교 발표가 있어서 오늘은 어려울 것 같습니다. 내일 아침 일찍 와서 마무리해도 될까요?`,
+            roman: `Timjangnim, jeongmal joesonghajiman naeil achime jungyohan hakgyo balpyoga isseoseo oneureun eoryeoul geot gatseumnida. Naeil achim iljjik waseo mamurihaedo doelkkayo?`,
+            good: true,
+            severity: 1,
+            reaction: `Team Lead Kim nods: “아, 발표가 있구나. 알겠어요, 내일 아침에 해요!” (Ah, you have a presentation. Got it, do it tomorrow morning!)`,
+            explain: `Balances deference (팀장님 + 죄송하지만), indirect hedge (어려울 것 같습니다), and constructive alternative.`
+          },
+          {
+            label: `Option B · Direct Negative Ability`,
+            native: `아니요, 오늘 야근 못 해요. 내일 발표 있어요.`,
+            roman: `Aniyo, oneul yageun mot haeyo. Naeil balpyo isseoyo.`,
+            good: false,
+            severity: 4,
+            reaction: `Team Lead Kim frowns slightly: “그래요? 알겠어요.” (Really? Alright then.)`,
+            explain: `Leading with 아니요 (“No”) + 못 해요 (“can't”) without mitigation creates high face-threat (mirroring Malaysian 3.67–4.00 manager/executive sensitivity).`
+          },
+          {
+            label: `Option C · Casual Refusal`,
+            native: `미안해요, 오늘 나 바빠서 안 돼요.`,
+            roman: `Mianhaeyo, oneul na bappaseo an dwaeyo.`,
+            good: false,
+            severity: 5,
+            reaction: `Team Lead Kim looks stern: “다음엔 말투 조심하세요.” (Watch your tone next time.)`,
+            explain: `Using 나 (“I”, plain) and 미안해요 (instead of 죄송합니다) to a manager is disrespectful.`
+          }
+        ]
+      }
+    }
+  },
+  {
+    id: `rp-dining`,
+    title: `Ordering Food & Calling Staff Politely`,
+    context: `Everyday Service · Polite Standard · Etiquette`,
+    setting: `You are at a busy local eatery and want to get the server's attention to order a signature dish without sounding rude.`,
+    langs: {
+      zh: {
+        npcName: `Server (服务员)`,
+        npcLine: `您好，请问几位？想点些什么？`,
+        npcRoman: `Nín hǎo, qǐngwèn jǐ wèi? Xiǎng diǎn xiē shénme?`,
+        npcEn: `“Hello, how many in your party? What would you like to order?”`,
+        choices: [
+          {
+            label: `Option A · Polite Standard + Softener`,
+            native: `你好，两位。麻烦给我们一份招牌面，谢谢！`,
+            roman: `Nǐ hǎo, liǎng wèi. Máfan gěi wǒmen yī fèn zhāopái miàn, xièxie!`,
+            good: true,
+            severity: 1,
+            reaction: `Server smiles: “好的，招牌面一份，马上来！” (Sure, one signature noodle, coming right up!)`,
+            explain: `Opening with 麻烦 (“sorry to trouble you”) and closing with 谢谢 shows warm service politeness.`
+          },
+          {
+            label: `Option B · Blunt Imperative`,
+            native: `喂！我要一碗面，快点！`,
+            roman: `Wèi! Wǒ yào yī wǎn miàn, kuài diǎn!`,
+            good: false,
+            severity: 4,
+            reaction: `Server responds coldly: “等着吧。” (Wait your turn.)`,
+            explain: `Shouting “喂!” (Hey!) and demanding “快点!” (Hurry up!) is abrasive; use “你好” or “不好意思” to call staff.`
+          },
+          {
+            label: `Option C · Overly Archaic / Stiff`,
+            native: `请问阁下，可否赐予鄙人一碗面条？`,
+            roman: `Qǐngwèn géxià, kěfǒu cìyǔ bǐrén yī wǎn miàntiáo?`,
+            good: false,
+            severity: 2,
+            reaction: `Server laughs nervously: “哈哈，您真客气，一份面是吧？” (Haha, you're so formal—one bowl of noodles?)`,
+            explain: `Historical drama diction (阁下, 鄙人) does not fit modern eateries—match register to the setting.`
+          }
+        ]
+      },
+      ja: {
+        npcName: `Server (店員)`,
+        npcLine: `いらっしゃいませ！ご注文はお決まりですか？`,
+        npcRoman: `Irasshaimase! Go-chūmon wa okimari desu ka?`,
+        npcEn: `“Welcome! Have you decided on your order?”`,
+        choices: [
+          {
+            label: `Option A · Polite Service Register`,
+            native: `すみません、この定食を一つお願いします。`,
+            roman: `Sumimasen, kono teishoku o hitotsu onegai shimasu.`,
+            good: true,
+            severity: 1,
+            reaction: `Server bows politely: 「かしこまりました！定食お一つですね。」 (Certainly! One set meal.)`,
+            explain: `すみません + 〜をお願いします is the natural, respectful standard in Japanese restaurants.`
+          },
+          {
+            label: `Option B · Misusing あなた / Plain Imperative`,
+            native: `あなた、これ一つくれ。`,
+            roman: `Anata, kore hitotsu kure.`,
+            good: false,
+            severity: 5,
+            reaction: `Server freezes momentarily: 「…少々お待ちください。」 (…Please wait a moment.)`,
+            explain: `Calling a stranger あなた and using plain command くれ (“give me”) is extremely rude.`
+          },
+          {
+            label: `Option C · Literal “I want”`,
+            native: `私はこれが欲しいです。`,
+            roman: `Watashi wa kore ga hoshii desu.`,
+            good: false,
+            severity: 3,
+            reaction: `Server tilts head slightly: 「こちらをお一つですね？」 (One of these, right?)`,
+            explain: `Textbook “I want” (欲しいです) sounds childlike in restaurants; always use 〜をお願いします or 〜をください.`
+          }
+        ]
+      },
+      ko: {
+        npcName: `Server (직원)`,
+        npcLine: `어서 오세요! 주문하시겠어요?`,
+        npcRoman: `Eoseo oseyo! Jumunhasigesseoyo?`,
+        npcEn: `“Welcome! Would you like to order?”`,
+        choices: [
+          {
+            label: `Option A · Polite Haeyo-che`,
+            native: `저기요, 여기 비빔밥 하나 주세요! 감사합니다.`,
+            roman: `Jeogiyo, yeogi bibimbap hana juseyo! Gamsahamnida.`,
+            good: true,
+            severity: 1,
+            reaction: `Server replies cheerfully: “네, 비빔밥 하나 금방 드릴게요!” (Yes, one bibimbap coming right away!)`,
+            explain: `저기요 (“Excuse me”) or 사장님 (“Owner”) + 〜주세요 (“please give”) is warm, natural Korean restaurant etiquette.`
+          },
+          {
+            label: `Option B · Calling “야!” + Banmal`,
+            native: `야, 비빔밥 하나 줘!`,
+            roman: `Ya, bibimbap hana jwo!`,
+            good: false,
+            severity: 5,
+            reaction: `Server looks offended: “손님, 말씀 조심해 주세요.” (Customer, please mind your words.)`,
+            explain: `Never use 야 or Banmal (줘) with service staff—service interactions in Korea require polite -요 forms.`
+          },
+          {
+            label: `Option C · Literal Pronouns (당신)`,
+            native: `당신, 나에게 비빔밥을 주세요.`,
+            roman: `Dangsin, naege bibimbabeul juseyo.`,
+            good: false,
+            severity: 4,
+            reaction: `Server looks confused and tense: “네…?” (Excuse me…?)`,
+            explain: `Pragmatic Failure: Literal “you” (당신, dangsin) in Korean sounds confrontational when spoken to strangers—use 저기요 instead.`
+          }
+        ]
+      }
+    }
+  },
+  {
+    id: `rp-peer`,
+    title: `Declining a Close Peer's Last-Minute Favor`,
+    context: `Campus · Equal Status · Close Distance`,
+    setting: `Your close classmate asks to borrow your laptop right before a deadline weekend when you need it for your own coursework (adapted from Yan & Bidin, 2025 Situation 3).`,
+    langs: {
+      zh: {
+        npcName: `Close Friend (好朋友阿明)`,
+        npcLine: `哎，我电脑坏了，这周末能借你的用两天吗？`,
+        npcRoman: `Āi, wǒ diànnǎo huài le, zhè zhōumò néng jiè nǐ de yòng liǎng tiān ma?`,
+        npcEn: `“Hey, my laptop broke—can I borrow yours for two days this weekend?”`,
+        choices: [
+          {
+            label: `Option A · Honest Excuse + Helpful Alternative`,
+            native: `抱歉啊兄弟，我这周末正好要赶论文离不开电脑，要不我陪你去图书馆借一台公用的？`,
+            roman: `Bàoqiàn a xiōngdì, wǒ zhè zhōumò zhènghǎo yào gǎn lùnwén lì bù kāi diànnǎo, yàobù wǒ péi nǐ qù túshūguǎn jiè yī tái gōngyòng de?`,
+            good: true,
+            severity: 1,
+            reaction: `Friend smiles gratefully: “谢啦！那我们一起去图书馆吧！” (Thanks! Let's go to the library together then!)`,
+            explain: `Reflects Yan & Bidin (2025): Even with close friends, Chinese students pair clear reasons with a constructive alternative to preserve warmth.`
+          },
+          {
+            label: `Option B · Cold Direct Refusal`,
+            native: `不行，我不借别人电脑。`,
+            roman: `Bù xíng, wǒ bù jiè biérén diànnǎo.`,
+            good: false,
+            severity: 4,
+            reaction: `Friend looks hurt: “哦…算了，没事。” (Oh… never mind then.)`,
+            explain: `Refusing a close peer without an explanation or empathy threatens positive face.`
+          },
+          {
+            label: `Option C · Overly Formal Distance`,
+            native: `实在非常抱歉，阁下之请求恐难从命。`,
+            roman: `Shízài fēicháng bàoqiàn, géxià zhī qǐngqiú kǒng nán cóngmìng.`,
+            good: false,
+            severity: 3,
+            reaction: `Friend laughs awkwardly: “你干嘛突然这么见外…” (Why are you acting like a stranger…)`,
+            explain: `Excessive formality with a close friend creates unwanted social distance.`
+          }
+        ]
+      },
+      ja: {
+        npcName: `Close Friend (親友ケンジ)`,
+        npcLine: `ごめん！パソコン壊れちゃって、今週末だけ貸してくれない？`,
+        npcRoman: `Gomen! Pasokon kowarechatte, konshūmatsu dake kashite kurenai?`,
+        npcEn: `“Sorry! My laptop broke—could you lend me yours just for this weekend?”`,
+        choices: [
+          {
+            label: `Option A · Peer Empathy + Reason + Alternative`,
+            native: `ごめん、今週末ちょうどレポートで使わなきゃいけなくて！図書館のPC一緒に借りに行こうか？`,
+            roman: `Gomen, konshūmatsu chōdo repōto de tsukawanakya ikenakute! Toshokan no PC issho ni kari ni ikō ka?`,
+            good: true,
+            severity: 1,
+            reaction: `Kenji laughs with relief: 「ほんと？助かる、ありがとう！」 (Really? That's a huge help, thanks!)`,
+            explain: `Uses natural Futsūkei peer register while offering a helpful alternative so friendship harmony stays intact.`
+          },
+          {
+            label: `Option B · Blunt Rejection`,
+            native: `無理。貸さないよ。`,
+            roman: `Muri. Kasanai yo.`,
+            good: false,
+            severity: 4,
+            reaction: `Kenji goes quiet: 「…そっか、悪いね。」 (…I see, sorry for asking.)`,
+            explain: `Bare 無理 without explanation or empathy damages rapport even among close friends.`
+          },
+          {
+            label: `Option C · Stiff Keigo to Close Friend`,
+            native: `誠に申し訳ございませんが、お貸しいたしかねます。`,
+            roman: `Makoto ni mōshiwake gozaimasen ga, okashi itashikanemasu.`,
+            good: false,
+            severity: 3,
+            reaction: `Kenji blinks: 「えっ、なんで敬語！？怒ってる？」 (Wait, why keigo?! Are you mad at me?)`,
+            explain: `In Japanese, suddenly switching into strict Keigo with a close friend signals coldness or anger.`
+          }
+        ]
+      },
+      ko: {
+        npcName: `Close Friend (친한 친구 민수)`,
+        npcLine: `미안한데 내 노트북 고장 나서 이번 주말만 좀 빌려줄 수 있어?`,
+        npcRoman: `Mianhande nae noteubuk gojang naseo ibeon jumalman jom billyeojul su isseo?`,
+        npcEn: `“Sorry, my laptop broke—can I borrow yours just for this weekend?”`,
+        choices: [
+          {
+            label: `Option A · Peer Warmth + Reason + Alternative`,
+            native: `미안, 나도 이번 주말에 과제 때문에 계속 써야 될 것 같아. 학교 도서관 노트북 대여 알아봐 줄까?`,
+            roman: `Mian, nado ibeon jumare gwaje ttaemune gyesok sseoya doel geot gata. Hakgyo doseogwan noteubuk daeyeo arabwa julkka?`,
+            good: true,
+            severity: 1,
+            reaction: `Minsu smiles: “아 맞아, 도서관 대여 있었지! 고마워!” (Oh right, library loan exists! Thanks!)`,
+            explain: `Softened Banmal (것 같아) + clear reason + helpful alternative keeps peer closeness strong.`
+          },
+          {
+            label: `Option B · Unsoftened Direct “No”`,
+            native: `안 돼, 못 빌려줘.`,
+            roman: `An dwae, mot billyeojwo.`,
+            good: false,
+            severity: 4,
+            reaction: `Minsu steps back awkwardly: “응… 알았어.” (Oh… okay.)`,
+            explain: `In Malaysian and Korean peer norms alike, direct refusal without an excuse feels unexpectedly cold.`
+          },
+          {
+            label: `Option C · Formal Distance`,
+            native: `대단히 죄송합니다만 대여가 어렵습니다.`,
+            roman: `Daedanhi joesonghamnidaman daeyeoga eoryeopseumnida.`,
+            good: false,
+            severity: 3,
+            reaction: `Minsu laughs nervously: “야, 너 갑자기 왜 존댓말 써?” (Hey, why are you suddenly speaking formally?)`,
+            explain: `Over-politeness with a close friend creates an unintended emotional wall.`
+          }
+        ]
+      }
+    }
+  }
+];
+
+// =========================================================================
+// 4. MALAYSIAN INTERCULTURAL BRIDGE DATA (Yan & Bidin, 2025)
+// =========================================================================
+const MALAYSIA_BRIDGE_DATA = {
+  lecturer: {
+    myText: `Malaysian undergraduates rated lecturer refusals at 3.17/5.00 face-threat (vs. 2.60 for Chinese peers). Guided by budi bahasa, honorific titles (“Prof / Dr / Encik”), and empathetic indirectness (“Maaf Prof, saya ada kekangan masa…”), Malaysians prioritize deferential regret (19.38% of all refusal strategies) and warm respect.`,
+    eaText: `Chinese, Japanese, and Korean lecturers expect a similar four-part sequence: Title + Apology/Cushion + Specific External Reason + Permission/Alternative. Japanese adds Keigo prefixes (お-/ご-); Korean mandates humble verbs (여쭙다) and -습니다; Chinese replaces 你 with 您.`,
+    tipText: `Transfer Advantage: Your Malaysian instinct to avoid abrupt “No” with lecturers is already aligned! Just avoid transferring casual English “Thank you, Prof” into Korean 수고하세요, and never omit honorific titles in East Asian openings.`
+  },
+  executive: {
+    myText: `Highest cross-cultural gap in Yan & Bidin (2025): Malaysian students rated refusing a Manager at 3.67 and Executive at 4.00 (vs. 2.80 and 2.90 for Chinese peers). High power-distance norms make Malaysians acutely cautious about preserving workplace harmony and boss face (jaga air muka).`,
+    eaText: `Japanese (ringi / nemawashi consensus) and Korean (jikgeup workplace rank) mirror this high power-distance sensitivity. Direct refusal phrases like できません (cannot) or 못 해요 are replaced with epistemic hedges (“it seems difficult”) and trailing pauses (〜まして…).`,
+    tipText: `Transfer Advantage: Channel your natural Malaysian workplace caution into East Asian hedging formulas—paired with offering a concrete alternative timeline (e.g., “tomorrow morning”), which Chinese managers especially appreciate.`
+  },
+  peer: {
+    myText: `Malaysian BALBAS students blend politeness with controlled directness among peers (“Sorry, I can't help right now”), scoring 2.40–2.60 face-threat for classmates/friends. Chinese BEMS rated peers slightly lower (2.00–2.30) yet still used longer formulas (4.2 strategies vs. 3.8) packed with alternatives.`,
+    eaText: `In Japanese and Korean peer interactions, casual plain forms (Futsūkei / Banmal) are used ONLY with close friends—yet softeners like かも (“maybe”) or 것 같아 (“it seems”) still cushion refusals. Sudden formal Keigo/Jondaetmal with a close friend signals anger or cold distance.`,
+    tipText: `Watch Out: Malaysian multilingual peers often say “Cannot lah, sorry!” directly. In Chinese, Japanese, or Korean, add a brief reason or alternative (“Let's grab library PCs instead”) so concise peer directness does not sound cold.`
+  },
+  dining: {
+    myText: `Malaysian etiquette emphasizes warm address terms (Kak, Abang, Uncle, Auntie) and courteous softeners (“Minta maaf, boleh saya…”). Calling someone abruptly without a relational marker feels disrespectful across Malaysia's multicultural communities.`,
+    eaText: `East Asia shares relational naming: Korean uses 사장님 (owner) or 저기요 (never 당신, “you”); Japanese uses すみません (blending excuse me + thank you); Chinese uses 麻烦您 / 你好 (never 喂!). Before meals, いただきます and 잘 먹겠습니다 formalize gratitude.`,
+    tipText: `Transfer Advantage: Think of Japanese すみません and Korean 죄송합니다/감사합니다 as functional cousins of Malaysian “Maaf / Terima kasih”—both bridge politeness and relational warmth.`
+  }
+};
+
+// =========================================================================
+// 5. STATE MANAGEMENT & PERSISTENCE
+// =========================================================================
+const DEFAULT_STATE = {
+  globalLang: `all`,
+  selectedPhraseId: `zh-gaitian`,
+  corpusCategory: `all`,
+  searchQuery: ``,
+  regLang: `ja`,
+  regIntent: `greet`,
+  regInterlocutor: `high`,
+  activeRoleplayId: `rp-lecturer`,
+  activeRoleplayLang: `zh`,
+  completedRoleplays: {},
+  savedPhrases: [],
+  chartMode: `severity`,
+  bridgeScenario: `lecturer`
+};
+
+let appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let chartInstance = null;
+
+async function persistState() {
+  try {
+    if (window.notebookAppApi && typeof window.notebookAppApi.setAppState === `function`) {
+      await window.notebookAppApi.setAppState(appState);
+    }
+  } catch (err) {
+    // Graceful fallback if shim unavailable
+  }
+}
+
+function getCssToken(tokenName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(tokenName).trim();
+}
+
+// =========================================================================
+// 6. GLOBAL CONTROLS & NAVIGATION
+// =========================================================================
+function setGlobalLanguage(lang) {
+  appState.globalLang = lang;
+  const buttons = document.querySelectorAll(`[data-global-lang]`);
+  buttons.forEach(function (btn) {
+    const isMatch = btn.dataset.globalLang === lang;
+    btn.classList.toggle(`is-active`, isMatch);
+    btn.setAttribute(`aria-pressed`, isMatch ? `true` : `false`);
+  });
+
+  // Sync register & roleplay dropdowns when a specific language is chosen
+  if (lang !== `all`) {
+    const regSelect = document.getElementById(`reg-lang-select`);
+    const rpSelect = document.getElementById(`rp-lang-select`);
+    if (regSelect) {
+      regSelect.value = lang;
+      appState.regLang = lang;
+    }
+    if (rpSelect) {
+      rpSelect.value = lang;
+      appState.activeRoleplayLang = lang;
+    }
+    // Auto-select first matching phrase if current phrase doesn't match
+    const current = CORPUS_DATA.find(function (p) { return p.id === appState.selectedPhraseId; });
+    if (!current || current.lang !== lang) {
+      const firstMatch = CORPUS_DATA.find(function (p) { return p.lang === lang; });
+      if (firstMatch) appState.selectedPhraseId = firstMatch.id;
+    }
+  }
+
+  renderCorpusList();
+  renderTranslatorVerdict();
+  updateRegisterSimulator();
+  loadRoleplayScenario();
+  renderNotebook();
+  persistState();
+}
+
+function jumpToSection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: `smooth`, block: `start` });
+  }
+}
+
+function handleResetAll(btn) {
+  if (!btn) return;
+  if (btn.dataset.armed !== `true`) {
+    btn.dataset.armed = `true`;
+    btn.textContent = `Confirm Reset`;
+    setTimeout(function () {
+      if (btn.dataset.armed === `true`) {
+        btn.dataset.armed = `false`;
+        btn.textContent = `Reset Progress`;
+      }
+    }, 3500);
+    return;
+  }
+  btn.dataset.armed = `false`;
+  btn.textContent = `Reset Progress`;
+  appState = JSON.parse(JSON.stringify(DEFAULT_STATE));
+  applyStateToUI();
+  persistState();
+}
+
+function exportStudyNotes() {
+  const lines = [
+    `EASense-AI — East Asian Language & Culture Companion`,
+    `Study Notebook Export`,
+    `====================================================`,
+    ``
+  ];
+  if (appState.savedPhrases.length === 0) {
+    lines.push(`No phrases saved yet. Bookmark expressions in Module 01 to build your revision guide.`);
+  } else {
+    appState.savedPhrases.forEach(function (entry, idx) {
+      lines.push(`${idx + 1}. [${entry.langLabel}] ${entry.native} (${entry.romanized})`);
+      lines.push(`   Literal MT: ${entry.literal}`);
+      lines.push(`   Cultural Output: ${entry.cultural}`);
+      lines.push(`   Context Note: ${entry.explanation}`);
+      if (entry.userNote) lines.push(`   Personal Note: ${entry.userNote}`);
+      lines.push(``);
+    });
+  }
+  const content = lines.join(`\n`);
+  if (window.notebookAppApi && typeof window.notebookAppApi.triggerFileDownload === `function`) {
+    window.notebookAppApi.triggerFileDownload({
+      content: content,
+      contentType: `text/plain`,
+      encoding: `UTF-8`,
+      filename: `easense-ai-study-notes.txt`
+    });
+    const fb = document.getElementById(`translator-feedback`);
+    if (fb) fb.textContent = `Exported study notes (.txt).`;
+  }
+}
+
+// =========================================================================
+// 7. MODULE 1: CONTEXTUAL TRANSLATOR
+// =========================================================================
+function filterCorpusList(query) {
+  appState.searchQuery = (query || ``).trim().toLowerCase();
+  renderCorpusList();
+}
+
+function filterCorpusByCategory(category) {
+  appState.corpusCategory = category || `all`;
+  renderCorpusList();
+  persistState();
+}
+
+function getFilteredCorpus() {
+  return CORPUS_DATA.filter(function (item) {
+    const langMatch = appState.globalLang === `all` || item.lang === appState.globalLang;
+    const catMatch = appState.corpusCategory === `all` || item.category === appState.corpusCategory;
+    const q = appState.searchQuery;
+    const textMatch = !q ||
+      item.native.toLowerCase().includes(q) ||
+      item.romanized.toLowerCase().includes(q) ||
+      item.cultural.toLowerCase().includes(q) ||
+      item.literal.toLowerCase().includes(q) ||
+      item.explanation.toLowerCase().includes(q) ||
+      item.categoryLabel.toLowerCase().includes(q);
+    return langMatch && catMatch && textMatch;
+  });
+}
+
+function renderCorpusList() {
+  const listEl = document.getElementById(`corpus-phrase-list`);
+  const countEl = document.getElementById(`corpus-count-label`);
+  if (!listEl) return;
+
+  const items = getFilteredCorpus();
+  if (countEl) countEl.textContent = String(items.length);
+
+  if (items.length === 0) {
+    listEl.innerHTML = `<div class="empty-state" style="padding: var(--space-md);">
+      <p style="margin: 0 0 var(--space-xs); font-weight: 600;">No matching expressions found</p>
+      <p style="margin: 0 0 var(--space-sm); font-size: 0.85rem; color: var(--on-surface-variant);">Try clearing your search filter or switching to “All (ZH / JA / KO)”.</p>
+      <button type="button" class="btn btn-secondary" onclick="clearCorpusFilters()">Clear Filters</button>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = items.map(function (item) {
+    const selected = item.id === appState.selectedPhraseId ? ` is-selected` : ``;
+    return `<button type="button" class="phrase-item${selected}" role="option" aria-selected="${item.id === appState.selectedPhraseId}" onclick="selectPhrase('${item.id}')">
+      <div>
+        <div class="phrase-native script-text">${item.native}</div>
+        <div class="phrase-sub">${item.romanized} · ${item.cultural}</div>
+      </div>
+      <span class="tag">${item.lang.toUpperCase()}</span>
+    </button>`;
+  }).join(``);
+}
+
+function clearCorpusFilters() {
+  appState.searchQuery = ``;
+  appState.corpusCategory = `all`;
+  const input = document.getElementById(`custom-intent-input`);
+  const catSel = document.getElementById(`corpus-category-select`);
+  if (input) input.value = ``;
+  if (catSel) catSel.value = `all`;
+  renderCorpusList();
+}
+
+function selectPhrase(id) {
+  appState.selectedPhraseId = id;
+  renderCorpusList();
+  renderTranslatorVerdict();
+  persistState();
+}
+
+function analyzeCustomIntent() {
+  const input = document.getElementById(`custom-intent-input`);
+  const fb = document.getElementById(`translator-feedback`);
+  if (!input) return;
+  const query = input.value.trim().toLowerCase();
+  if (!query) {
+    if (fb) fb.textContent = `Enter a keyword like “refuse”, “professor”, “eat”, or “gentleman” to match.`;
+    return;
+  }
+  const matches = getFilteredCorpus();
+  if (matches.length > 0) {
+    selectPhrase(matches[0].id);
+    if (fb) fb.textContent = `Matched best pragmatic entry for “${input.value.trim()}”.`;
+  } else {
+    if (fb) fb.textContent = `No exact entry for “${input.value.trim()}” — try keywords like “refuse”, “thank”, “sorry”, or “meal”.`;
+  }
+}
+
+function renderTranslatorVerdict() {
+  const item = CORPUS_DATA.find(function (p) { return p.id === appState.selectedPhraseId; }) || CORPUS_DATA[0];
+  if (!item) return;
+
+  const setMap = {
+    'out-lang-tag': item.langLabel,
+    'out-cat-tag': item.categoryLabel,
+    'out-native': item.native,
+    'out-romanized': item.romanized,
+    'out-literal': item.literal,
+    'out-failure-type': item.failureRisk,
+    'out-cultural': item.cultural,
+    'out-function': item.intent,
+    'out-explanation': item.explanation,
+    'out-trap': item.trap
+  };
+  Object.keys(setMap).forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = setMap[id];
+  });
+
+  const saveBtn = document.getElementById(`btn-save-phrase`);
+  if (saveBtn) {
+    const alreadySaved = appState.savedPhrases.some(function (s) { return s.id === item.id; });
+    saveBtn.innerHTML = alreadySaved
+      ? `<i data-lucide="check" aria-hidden="true" width="16" height="16"></i> Saved in Notebook`
+      : `<i data-lucide="bookmark" aria-hidden="true" width="16" height="16"></i> Save to Notebook`;
+  }
+  if (window.lucide && typeof window.lucide.createIcons === `function`) {
+    window.lucide.createIcons();
+  }
+}
+
+function saveCurrentPhrase() {
+  const item = CORPUS_DATA.find(function (p) { return p.id === appState.selectedPhraseId; });
+  const fb = document.getElementById(`translator-feedback`);
+  if (!item) return;
+
+  const exists = appState.savedPhrases.some(function (s) { return s.id === item.id; });
+  if (exists) {
+    if (fb) fb.textContent = `“${item.native}” is already in your Study Notebook.`;
+    return;
+  }
+
+  appState.savedPhrases.push({
+    id: item.id,
+    lang: item.lang,
+    langLabel: item.langLabel,
+    native: item.native,
+    romanized: item.romanized,
+    literal: item.literal,
+    cultural: item.cultural,
+    explanation: item.explanation,
+    userNote: ``
+  });
+  if (fb) fb.textContent = `Saved “${item.native}” to Study Notebook.`;
+  updateStatsUI();
+  renderTranslatorVerdict();
+  renderNotebook();
+  persistState();
+}
+
+// =========================================================================
+// 8. MODULE 2: REGISTER & HONORIFIC BREAKDOWN
+// =========================================================================
+function updateRegisterSimulator() {
+  const langEl = document.getElementById(`reg-lang-select`);
+  const intentEl = document.getElementById(`reg-intent-select`);
+  const interEl = document.getElementById(`reg-interlocutor-select`);
+  if (!langEl || !intentEl || !interEl) return;
+
+  appState.regLang = langEl.value;
+  appState.regIntent = intentEl.value;
+  appState.regInterlocutor = interEl.value;
+
+  const entry = REGISTER_DATA[appState.regLang]
+    && REGISTER_DATA[appState.regLang][appState.regIntent]
+    && REGISTER_DATA[appState.regLang][appState.regIntent][appState.regInterlocutor];
+
+  if (!entry) return;
+
+  const tierEl = document.getElementById(`reg-tier-badge`);
+  const coordsEl = document.getElementById(`reg-social-coords`);
+  const nativeEl = document.getElementById(`reg-output-native`);
+  const romanEl = document.getElementById(`reg-output-roman`);
+  const glossEl = document.getElementById(`reg-output-gloss`);
+  const stripEl = document.getElementById(`reg-morpheme-strip`);
+  const warnEl = document.getElementById(`reg-warning-text`);
+
+  if (tierEl) tierEl.textContent = entry.tier;
+  if (coordsEl) coordsEl.textContent = entry.coords;
+  if (nativeEl) nativeEl.textContent = entry.native;
+  if (romanEl) romanEl.textContent = entry.roman;
+  if (glossEl) glossEl.textContent = entry.gloss;
+  if (warnEl) warnEl.textContent = entry.warning;
+
+  if (stripEl) {
+    stripEl.innerHTML = entry.morphemes.map(function (m, idx) {
+      const activeCls = idx === 0 ? ` is-active` : ``;
+      return `<button type="button" class="morpheme-chip${activeCls}" onclick="inspectMorpheme(${idx})">
+        <span class="morpheme-token script-text">${m.token}</span>
+        <span class="morpheme-role">${m.role}</span>
+      </button>`;
+    }).join(``);
+  }
+
+  inspectMorpheme(0);
+  persistState();
+}
+
+function inspectMorpheme(index) {
+  const entry = REGISTER_DATA[appState.regLang]
+    && REGISTER_DATA[appState.regLang][appState.regIntent]
+    && REGISTER_DATA[appState.regLang][appState.regIntent][appState.regInterlocutor];
+  if (!entry || !entry.morphemes[index]) return;
+
+  const chips = document.querySelectorAll(`#reg-morpheme-strip .morpheme-chip`);
+  chips.forEach(function (c, idx) {
+    c.classList.toggle(`is-active`, idx === index);
+  });
+
+  const detailText = document.getElementById(`reg-morpheme-text`);
+  if (detailText) {
+    const m = entry.morphemes[index];
+    detailText.textContent = `${m.token} (${m.role}): ${m.note}`;
+  }
+}
+
+// =========================================================================
+// 9. MODULE 3: SIMULATED REAL-WORLD ROLEPLAY SCENARIOS
+// =========================================================================
+function renderRoleplayList() {
+  const listEl = document.getElementById(`rp-scenario-list`);
+  if (!listEl) return;
+
+  listEl.innerHTML = ROLEPLAY_SCENARIOS.map(function (sc) {
+    const isSelected = sc.id === appState.activeRoleplayId ? ` is-selected` : ``;
+    const key = `${sc.id}:${appState.activeRoleplayLang}`;
+    const done = appState.completedRoleplays[key] === true;
+    const badge = done ? `<span class="tag tag-moss">Cleared</span>` : `<span class="tag">Practice</span>`;
+    return `<button type="button" class="phrase-item${isSelected}" onclick="selectRoleplay('${sc.id}')">
+      <div>
+        <div style="font-weight: 600; font-size: 0.95rem;">${sc.title}</div>
+        <div class="phrase-sub">${sc.context}</div>
+      </div>
+      ${badge}
+    </button>`;
+  }).join(``);
+}
+
+function selectRoleplay(id) {
+  appState.activeRoleplayId = id;
+  loadRoleplayScenario();
+  persistState();
+}
+
+function loadRoleplayScenario() {
+  const langSelect = document.getElementById(`rp-lang-select`);
+  if (langSelect) {
+    appState.activeRoleplayLang = langSelect.value;
+  }
+
+  const sc = ROLEPLAY_SCENARIOS.find(function (s) { return s.id === appState.activeRoleplayId; }) || ROLEPLAY_SCENARIOS[0];
+  const langPack = sc.langs[appState.activeRoleplayLang];
+  if (!sc || !langPack) return;
+
+  renderRoleplayList();
+
+  const key = `${sc.id}:${appState.activeRoleplayLang}`;
+  const isCleared = appState.completedRoleplays[key] === true;
+
+  const mapText = {
+    'rp-context-tag': sc.context,
+    'rp-title': sc.title,
+    'rp-setting-desc': sc.setting,
+    'rp-npc-name': langPack.npcName,
+    'rp-npc-line': langPack.npcLine,
+    'rp-npc-roman': langPack.npcRoman,
+    'rp-npc-en': langPack.npcEn,
+    'rp-completion-badge': isCleared ? `Scenario Cleared` : `Ready to Practice`
+  };
+  Object.keys(mapText).forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = mapText[id];
+  });
+
+  const choicesEl = document.getElementById(`rp-choices`);
+  if (choicesEl) {
+    choicesEl.innerHTML = langPack.choices.map(function (c, idx) {
+      return `<button type="button" class="choice-btn" id="rp-choice-${idx}" onclick="chooseRoleplayOption(${idx})">
+        <span class="label" style="color: var(--on-surface-variant);">Response ${idx + 1}</span>
+        <span class="script-text" style="font-size: 1.05rem; font-weight: 600;">${c.native}</span>
+        <span class="romanized-line">${c.roman}</span>
+      </button>`;
+    }).join(``);
+  }
+
+  const fbPanel = document.getElementById(`rp-feedback-panel`);
+  if (fbPanel) fbPanel.style.display = `none`;
+}
+
+function chooseRoleplayOption(idx) {
+  const sc = ROLEPLAY_SCENARIOS.find(function (s) { return s.id === appState.activeRoleplayId; });
+  if (!sc) return;
+  const langPack = sc.langs[appState.activeRoleplayLang];
+  if (!langPack || !langPack.choices[idx]) return;
+
+  const choice = langPack.choices[idx];
+  langPack.choices.forEach(function (_, i) {
+    const btn = document.getElementById(`rp-choice-${i}`);
+    if (btn) {
+      btn.classList.remove(`is-chosen-good`, `is-chosen-bad`);
+      if (i === idx) {
+        btn.classList.add(choice.good ? `is-chosen-good` : `is-chosen-bad`);
+      }
+    }
+  });
+
+  const fbPanel = document.getElementById(`rp-feedback-panel`);
+  const verdictEl = document.getElementById(`rp-feedback-verdict`);
+  const sevLabel = document.getElementById(`rp-severity-label`);
+  const trackEl = document.getElementById(`rp-severity-track`);
+  const reactEl = document.getElementById(`rp-npc-reaction`);
+  const explainEl = document.getElementById(`rp-feedback-explain`);
+
+  if (fbPanel) {
+    fbPanel.style.display = `flex`;
+    fbPanel.className = `pragmatic-callout ${choice.good ? 'is-safe' : 'is-danger'}`;
+  }
+  if (verdictEl) {
+    verdictEl.textContent = choice.good ? `Pragmatically Fluent · Face Preserved` : `Pragmatic Friction Detected (${choice.label})`;
+    verdictEl.style.color = choice.good ? `var(--positive)` : `var(--tertiary)`;
+  }
+  if (sevLabel) sevLabel.textContent = `Face-Threat Risk: ${choice.severity} / 5`;
+  if (reactEl) reactEl.textContent = choice.reaction;
+  if (explainEl) explainEl.textContent = choice.explain;
+
+  if (trackEl) {
+    let pips = ``;
+    for (let i = 1; i <= 5; i++) {
+      let cls = `severity-pip`;
+      if (i <= choice.severity) {
+        cls += choice.severity <= 2 ? ` is-filled-low` : (choice.severity === 3 ? ` is-filled-mid` : ` is-filled-high`);
+      }
+      pips += `<div class="${cls}"></div>`;
+    }
+    trackEl.innerHTML = pips;
+  }
+
+  if (choice.good) {
+    const key = `${sc.id}:${appState.activeRoleplayLang}`;
+    appState.completedRoleplays[key] = true;
+    const badge = document.getElementById(`rp-completion-badge`);
+    if (badge) badge.textContent = `Scenario Cleared`;
+    updateStatsUI();
+    renderRoleplayList();
+    persistState();
+  }
+}
+
+// =========================================================================
+// 10. MODULE 4: MALAYSIAN INTERCULTURAL CHART & BRIDGE
+// =========================================================================
+function switchChartMode(mode) {
+  appState.chartMode = mode;
+  const sevBtn = document.getElementById(`btn-chart-severity`);
+  const strBtn = document.getElementById(`btn-chart-strategy`);
+  if (sevBtn) {
+    sevBtn.classList.toggle(`is-active`, mode === `severity`);
+    sevBtn.setAttribute(`aria-pressed`, mode === `severity` ? `true` : `false`);
+  }
+  if (strBtn) {
+    strBtn.classList.toggle(`is-active`, mode === `strategy`);
+    strBtn.setAttribute(`aria-pressed`, mode === `strategy` ? `true` : `false`);
+  }
+  renderInterculturalChart();
+  persistState();
+}
+
+function renderInterculturalChart() {
+  const canvas = document.getElementById(`interculturalChart`);
+  if (!canvas || typeof Chart === `undefined`) return;
+
+  if (chartInstance) {
+    chartInstance.destroy();
+    chartInstance = null;
+  }
+
+  const dataColor1 = getCssToken(`--data-1`);
+  const dataColor2 = getCssToken(`--data-2`);
+  const gridColor = getCssToken(`--outline-variant`);
+  const inkColor = getCssToken(`--on-surface`);
+  const fontMono = getCssToken(`--font-label`);
+
+  const kicker = document.getElementById(`chart-kicker`);
+  const title = document.getElementById(`chart-title`);
+  const caption = document.getElementById(`chart-caption`);
+
+  if (appState.chartMode === `severity`) {
+    if (kicker) kicker.textContent = `5-Point Likert Scale · 8 Scenarios`;
+    if (title) title.textContent = `Perceived Face-Threat & Offense Severity`;
+    if (caption) caption.textContent = `Source: Yan & Bidin (2025), Forum for Linguistic Studies. Malaysian undergraduates (BALBAS) rated face-threat higher across all 8 contexts, peaking in hierarchical refusals to Executives (4.00 vs. 2.90) and Managers (3.67 vs. 2.80).`;
+
+    chartInstance = new Chart(canvas, {
+      type: `bar`,
+      data: {
+        labels: [`Lecturer`, `Event Official`, `Friend`, `Classmate`, `Manager`, `Executive`, `Co-worker`, `Fellow Intern`],
+        datasets: [
+          {
+            label: `Malaysian Undergraduates (BALBAS)`,
+            data: [3.17, 2.80, 2.60, 2.40, 3.67, 4.00, 3.00, 3.00],
+            backgroundColor: dataColor2,
+            borderRadius: 1
+          },
+          {
+            label: `Chinese Undergraduates (BEMS)`,
+            data: [2.60, 2.40, 2.30, 2.00, 2.80, 2.90, 2.80, 2.20],
+            backgroundColor: dataColor1,
+            borderRadius: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: `top`,
+            labels: { color: inkColor, font: { family: fontMono, size: 11 } }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 5,
+            grid: { color: gridColor },
+            ticks: { color: inkColor, font: { family: fontMono, size: 11 } },
+            title: { display: true, text: `Mean Severity (1–5)`, color: inkColor, font: { family: fontMono, size: 11 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: inkColor, font: { family: fontMono, size: 10 } }
+          }
+        }
+      }
+    });
+  } else {
+    if (kicker) kicker.textContent = `Refusal Taxonomy Proportions (%)`;
+    if (title) title.textContent = `Refusal Strategy Distribution: Malaysia vs. China`;
+    if (caption) caption.textContent = `Source: Yan & Bidin (2025). Both groups heavily favor indirect refusals (72.50% MY vs. 64.83% CN), while Malaysians rely strongly on Regret/Apology (19.38% vs. 0.85%) and Chinese students use more Gratitude Adjuncts (16.10% vs. 8.12%) and Alternatives.`;
+
+    chartInstance = new Chart(canvas, {
+      type: `bar`,
+      data: {
+        labels: [`Direct Refusal`, `Indirect Refusal`, `Adjuncts`, `Excuse / Reason`, `Regret / Apology`, `Alternative`, `Gratitude`],
+        datasets: [
+          {
+            label: `Malaysian (N=160 instances, %)`,
+            data: [13.75, 72.50, 13.75, 27.50, 19.38, 11.25, 8.12],
+            backgroundColor: dataColor2,
+            borderRadius: 1
+          },
+          {
+            label: `Chinese (N=236 instances, %)`,
+            data: [13.98, 64.83, 21.19, 31.78, 0.85, 13.56, 16.10],
+            backgroundColor: dataColor1,
+            borderRadius: 1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: `top`,
+            labels: { color: inkColor, font: { family: fontMono, size: 11 } }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 80,
+            grid: { color: gridColor },
+            ticks: { color: inkColor, font: { family: fontMono, size: 11 } },
+            title: { display: true, text: `Proportion (%)`, color: inkColor, font: { family: fontMono, size: 11 } }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: inkColor, font: { family: fontMono, size: 10 } }
+          }
+        }
+      }
+    });
+  }
+}
+
+function updateMalaysiaBridge() {
+  const sel = document.getElementById(`my-scenario-select`);
+  if (!sel) return;
+  appState.bridgeScenario = sel.value;
+  const data = MALAYSIA_BRIDGE_DATA[appState.bridgeScenario];
+  if (!data) return;
+
+  const myEl = document.getElementById(`bridge-my-text`);
+  const eaEl = document.getElementById(`bridge-ea-text`);
+  const tipEl = document.getElementById(`bridge-tip-text`);
+  if (myEl) myEl.textContent = data.myText;
+  if (eaEl) eaEl.textContent = data.eaText;
+  if (tipEl) tipEl.textContent = data.tipText;
+
+  persistState();
+}
+
+// =========================================================================
+// 11. MODULE 5: STUDY NOTEBOOK & STATS
+// =========================================================================
+function updateStatsUI() {
+  const savedEl = document.getElementById(`stat-saved-count`);
+  const rpEl = document.getElementById(`stat-roleplay-count`);
+  if (savedEl) savedEl.textContent = String(appState.savedPhrases.length);
+
+  // Count distinct scenarios cleared in any language
+  const clearedIds = new Set();
+  Object.keys(appState.completedRoleplays).forEach(function (k) {
+    if (appState.completedRoleplays[k]) {
+      clearedIds.add(k.split(`:`)[0]);
+    }
+  });
+  if (rpEl) rpEl.textContent = `${clearedIds.size}/${ROLEPLAY_SCENARIOS.length}`;
+}
+
+function renderNotebook() {
+  const container = document.getElementById(`notebook-container`);
+  if (!container) return;
+
+  const list = appState.savedPhrases.filter(function (item) {
+    return appState.globalLang === `all` || item.lang === appState.globalLang;
+  });
+
+  if (list.length === 0) {
+    container.innerHTML = `<div class="empty-state">
+      <span class="label">Study Notebook Empty</span>
+      <p style="margin: var(--space-xs) 0 var(--space-md); max-width: 60ch;">
+        You haven't bookmarked any expressions for ${appState.globalLang === 'all' ? 'Chinese, Japanese, or Korean' : appState.globalLang.toUpperCase()} yet. Inspect an expression in Module 01 and click “Save to Notebook” to build your revision guide.
+      </p>
+      <button type="button" class="btn btn-primary" onclick="jumpToSection('sec-translator')">Browse Contextual Expressions</button>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="card-grid">${list.map(function (entry) {
+    return `<article class="washi-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-sm);">
+        <span class="tag tag-moss">${entry.langLabel}</span>
+        <button type="button" class="btn btn-ghost" style="min-height: 36px; padding: var(--space-xs) var(--space-sm);" onclick="removeSavedPhrase('${entry.id}')" aria-label="Remove ${entry.native}">Remove</button>
+      </div>
+      <div class="native-hero script-text" style="font-size: 1.45rem; margin-top: var(--space-sm);">${entry.native}</div>
+      <div class="romanized-line">${entry.romanized}</div>
+      <p style="margin: var(--space-xs) 0; font-size: 0.88rem; color: var(--tertiary);"><strong>Literal Trap:</strong> ${entry.literal}</p>
+      <p style="margin: var(--space-xs) 0; font-size: 0.92rem;"><strong>Cultural Meaning:</strong> ${entry.cultural}</p>
+      <div class="field-group" style="margin-top: var(--space-sm);">
+        <label class="field-label" for="note-${entry.id}">Personal Study Reflection</label>
+        <input type="text" id="note-${entry.id}" class="control-input" value="${(entry.userNote || '').replace(/"/g, '&quot;')}" placeholder="Add your class note or usage reminder…" oninput="updateSavedNote('${entry.id}', this.value)">
+      </div>
+    </article>`;
+  }).join(``)}</div>`;
+}
+
+function updateSavedNote(id, val) {
+  const target = appState.savedPhrases.find(function (s) { return s.id === id; });
+  if (target) {
+    target.userNote = val;
+    persistState();
+  }
+}
+
+function removeSavedPhrase(id) {
+  appState.savedPhrases = appState.savedPhrases.filter(function (s) { return s.id !== id; });
+  updateStatsUI();
+  renderTranslatorVerdict();
+  renderNotebook();
+  persistState();
+}
+
+// =========================================================================
+// 12. INITIALIZATION
+// =========================================================================
+function applyStateToUI() {
+  const langButtons = document.querySelectorAll(`[data-global-lang]`);
+  langButtons.forEach(function (btn) {
+    const match = btn.dataset.globalLang === appState.globalLang;
+    btn.classList.toggle(`is-active`, match);
+    btn.setAttribute(`aria-pressed`, match ? `true` : `false`);
+  });
+
+  const catSel = document.getElementById(`corpus-category-select`);
+  if (catSel) catSel.value = appState.corpusCategory;
+
+  const regLang = document.getElementById(`reg-lang-select`);
+  const regIntent = document.getElementById(`reg-intent-select`);
+  const regInter = document.getElementById(`reg-interlocutor-select`);
+  if (regLang) regLang.value = appState.regLang;
+  if (regIntent) regIntent.value = appState.regIntent;
+  if (regInter) regInter.value = appState.regInterlocutor;
+
+  const rpLang = document.getElementById(`rp-lang-select`);
+  if (rpLang) rpLang.value = appState.activeRoleplayLang;
+
+  const bridgeSel = document.getElementById(`my-scenario-select`);
+  if (bridgeSel) bridgeSel.value = appState.bridgeScenario;
+
+  updateStatsUI();
+  renderCorpusList();
+  renderTranslatorVerdict();
+  updateRegisterSimulator();
+  loadRoleplayScenario();
+  switchChartMode(appState.chartMode);
+  updateMalaysiaBridge();
+  renderNotebook();
+}
+
+async function initApp() {
+  try {
+    if (window.notebookAppApi && typeof window.notebookAppApi.getAppState === `function`) {
+      const saved = await window.notebookAppApi.getAppState();
+      if (saved && typeof saved === `object`) {
+        appState = Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE)), saved);
+      }
+    }
+  } catch (err) {
+    // Use default state on fresh start
+  }
+
+  applyStateToUI();
+
+  if (window.lucide && typeof window.lucide.createIcons === `function`) {
+    window.lucide.createIcons();
+  }
+  if (window.notebookAppApi && typeof window.notebookAppApi.notifyAppReady === `function`) {
+    window.notebookAppApi.notifyAppReady();
+  }
+}
+
+document.addEventListener(`DOMContentLoaded`, initApp);
+</script>
+</body>
+</html>
